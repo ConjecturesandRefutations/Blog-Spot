@@ -1,0 +1,420 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;500;600;800&family=VT323&');
+
+*{
+    font-family: poppins, consolas;
+}
+
+body{
+  margin: 0;
+}
+
+button{
+  cursor: pointer;
+  background-color: red;
+  padding: 5px;
+  font-size: larger;
+  border-radius: 5px;
+}
+
+button:hover,.btn:hover{
+  color: #747474;
+}
+  .brand{
+    background: #cbb09c !important;
+}
+.brand-text{
+    color: #cbb09c !important;
+}
+.secondary{
+  background: #8baaff !important;
+}
+.logo-description {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.quill{
+    width: 100px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+}
+  .buttons {
+display: flex;
+gap: 20px;
+margin-top: 50px;
+}
+
+.feedback{
+margin-top: 50px
+}
+
+.footer{
+font-style: italic;
+}   
+
+.header{
+  top: 0;
+}
+
+.blog-card{
+  height: 400px;
+}
+
+.blog-card:hover,.user-card:hover,.profile-card:hover{
+    background-color: #dddddd;
+}
+
+.blog-card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+@media only screen and (max-width: 992px) {
+  .brand-text {
+      margin-left: 50px;
+  }
+  }
+  @media only screen and (max-width: 347px) {
+  .write {
+      position: absolute;
+      top: 100px;
+      left: 20%;
+  }
+  }      
+
+
+/* FOR THE LOGIN PAGE */
+
+.login{
+  background-color: white;
+  color: black;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid black;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login:hover{
+  color: white;
+  background-color: transparent;
+}
+
+
+@media(max-width:506px){
+  .login{
+    font-size: small;
+  }
+
+}
+
+@keyframes pan {
+ 100% {
+    background-position: 15% 50%;
+     }
+}
+
+.login-page {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  background-image: url(./images/pencils.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: none;
+  animation: pan 6s infinite alternate linear;
+  height: 100vh; 
+  width: 100%; 
+  margin: 0;
+  overflow: scroll;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+ }
+
+.login-card {
+  width: 400px;
+  padding: 20px 30px 44px;
+  border-radius: 24px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.loginSignup{
+  margin-bottom: 0px; 
+}
+
+  .login-card > h3 {
+  margin: 0 0 30px;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.login-form {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.signup-form {
+  gap: 5px !important;
+}
+
+.login-form > a {
+  color: #216ce7;
+}
+
+.login-form > input,
+.login-form > button {
+  height: 56px;
+  padding: 0 16px;
+  border-radius: 8px;
+}
+
+.login-form > input {
+  border: 2px solid #ebebeb;
+}
+
+.loginBtn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none !important;
+  color: #fff !important;
+  background-color: #ff6b6b;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.noLogin{
+  font-size: 12px !important;
+}
+
+.loginBtn:hover {
+  background-color: #ff4040;
+}
+
+.loginBtn:active {
+  background-color: #ff1f1f;
+}
+
+.loginBtn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.4);
+}
+
+
+.back-home{
+  background-color: transparent;
+  color: white;
+  font-size: small;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid white;
+  text-decoration: none;
+    }
+
+.back-home:hover{
+  border: none;
+    }
+
+.note{
+  font-size: smaller;
+    }
+
+.error{
+  color: red;
+}
+
+#logout{ 
+  padding: none;
+  background-color: white;
+}
+
+#logout:hover{ 
+  padding: none;
+  background-color: transparent;
+  color: white;
+}
+
+#logout-anchor{
+  text-decoration: none;
+}
+
+#logout-anchor:hover{
+  color: white;
+}
+
+#brand-image{
+  height: 50px;
+  width: 50px;
+  margin-top: 5px;
+  display: none !important;
+}
+
+#burger-anchor,#burger-img{
+  display: none !important;
+  top: 50%;
+  transform: translate(0,-50%);
+  height: 30px;
+  width: 30px;
+}
+
+.fixed{
+  top: 0;
+  position: sticky;
+  z-index: 999;
+}
+
+.favicon{
+  display: none !important;
+}
+
+.blog-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 9;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 20px;
+}
+
+
+@media (max-width: 800px) {
+  #nav-mobile {
+    display: none !important;
+  }
+  #burger-anchor,#burger-img{
+    display: block !important;
+    position: absolute;
+    right: 30px;
+  }
+}
+
+@media (min-width: 500px) {
+    .login-page {
+      padding: 0;
+    }
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    margin: 0;
+    width: 400px;
+  }
+  #brand-image{
+    display: block !important;
+    margin-left: 30px;
+  }
+  #brand{
+    display: none !important;
+  }
+  .quill{
+    display: none !important;
+  }
+  .favicon{
+    display: block !important;
+    height: 50px;
+    width: 50px;
+    margin-left: 50%;
+    transform: translate(-50%);
+    margin-bottom: 20px;
+  }
+  #category{
+    display: none !important;
+  }
+}
+
+
+@media (max-width: 450px) {
+  .login-card {
+    margin: 0;
+    width: 350px;
+  }
+}
+
+@media (max-width: 400px) {
+  .login-card {
+    margin: 0;
+    width: 300px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-card {
+    margin: 0;
+    width: 280px;
+  }
+  .blog-title{
+    font-size: small;
+  }
+  .favicon{
+    height: 30px;
+    width: 30px;
+    margin-bottom: 10px;
+
+  }
+}
+
+@media (max-width: 328px) {
+  .login-card {
+    margin: 0;
+    width: 270px;
+  }
+}
+
+@media (max-width: 300px) {
+  .login-card {
+    margin: 0;
+    width: 250px;
+  }
+}
+
+@media (max-width: 310px) {
+  .login-card {
+    margin: 0;
+    width: 240px;
+  }
+}
+
+@media (max-width: 290px) {
+  .login-card {
+    margin: 0;
+    width: 230px;
+  }
+}
+
+@media (max-width: 280px) {
+  .login-card {
+    margin: 0;
+    width: 210px;
+  }
+}
+
+@media (max-width: 275px) {
+  .login-card {
+    margin: 0;
+    width: 200px;
+  }
+}
