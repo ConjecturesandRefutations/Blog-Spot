@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (password_verify($_POST["password"], $user["password_hash"])) {
             session_start();
             session_regenerate_id();
-            $_SESSION["user_id"] = $user["user_id"];
+            $_SESSION["user_id"] = $user["user_id"]; // Change "id" to "user_id"
             header("Location:../index.php"); 
             exit;
         }
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <h2>Login</h2>
 
             <?php if ($is_invalid): ?>
-                <em class="error-message">Invalid Login</em>
+                <em class="error">Invalid Login</em>
             <?php endif; ?>
 
           <form class="login-form" method="POST">

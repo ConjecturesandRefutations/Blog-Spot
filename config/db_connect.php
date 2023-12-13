@@ -1,7 +1,7 @@
 <?php
 
 //connect to database
-$conn = mysqli_connect('localhost', 'alfie', 'test1234', 'blog spot');
+$conn = mysqli_connect('localhost', 'alfie', '', 'blog spot');
 
 if ($conn->connect_error) {
     error_log("Connection failed: " . $conn->connect_error);

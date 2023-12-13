@@ -12,8 +12,4 @@ $_SESSION['last_logout'] = time();
 
 header("Location: ../authentication/login.php");
 exit;
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

@@ -81,7 +81,8 @@ function calculateWordCount($content) {
     <div class="col s12 m6 offset-m3">
         <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
             <div class="input-field col s12">
-                <input type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
+                <i class="material-icons prefix">search</i></label>
+                <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
                 <label for="search">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
             </div>
             <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
@@ -129,7 +130,4 @@ function calculateWordCount($content) {
     });
 });
 </script>
-<<<<<<< HEAD
-=======
 
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

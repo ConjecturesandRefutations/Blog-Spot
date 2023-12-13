@@ -24,8 +24,4 @@ if (isset($_GET['search'])) {
     // Return the result as JSON
     echo json_encode($users);
 }
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

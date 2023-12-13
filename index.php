@@ -43,17 +43,18 @@ mysqli_close($conn);
 
 <h4 class='center grey-text'>Feed</h4>
 
-<!-- Search Bar -->
 <div class="row">
     <div class="col s12 m6 offset-m3"> 
         <form method="GET" action="">
             <div class="input-field">
-                <input id="search" type="text" name="search" class="validate">
+                <i class="material-icons prefix">search</i></label>
+                <input id="search" type="text" name="search" class="validate white">
                 <label for="search">Search Blogs by Title, Category, or Author</label>
             </div>
         </form>
     </div>
 </div>
+
 
 <div class="container">
     <div class="row d-flex flex-wrap">
@@ -134,7 +135,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
-<<<<<<< HEAD
-=======
 
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f
+</html>

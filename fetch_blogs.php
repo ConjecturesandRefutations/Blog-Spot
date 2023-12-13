@@ -45,8 +45,4 @@ foreach ($blogs as $blog):
     </div>
 <?php
 endforeach;
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

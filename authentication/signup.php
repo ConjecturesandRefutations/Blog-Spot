@@ -69,8 +69,4 @@ try {
     die("An error occurred during signup: " . $e->getMessage());
 }
 
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

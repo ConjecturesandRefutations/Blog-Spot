@@ -51,7 +51,8 @@ mysqli_close($conn);
     <div class="col s12 m6 offset-m3"> 
         <form>
             <div class="input-field">
-                <input id="search" type="text" name="search" class="validate">
+                <i class="material-icons prefix">search</i></label>
+                <input id="search" type="text" name="search" class="validate white">
                 <label for="search">Search Users by Name or Favourite Topic</label>
             </div>
         </form>
@@ -62,7 +63,7 @@ mysqli_close($conn);
 <div class="container">
     <div class="row" id="user-list">
         <?php foreach ($users as $profileUser) : ?>
-            <div class="col s12" style="border: 1px solid grey;">
+            <div class="col s12 user-card" style="border: 1px solid grey;">
                 <a href="profile.php?id=<?php echo $profileUser['user_id']; ?>" class="card-content center grey-text text-darken-2">
                     <h6 style="font-weight: bold"><?php echo htmlspecialchars($profileUser['name']); ?></h6>
                     <p style="font-size: smaller">Total Blogs: <?php echo $profileUser['numBlogs']; ?></p>
@@ -113,8 +114,4 @@ $(document).ready(function() {
 </script>
 
 <?php include('templates/footer.php'); ?>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

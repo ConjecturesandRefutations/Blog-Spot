@@ -60,8 +60,4 @@ if (isset($_GET["id"])) {
 
 // Close connection
 mysqli_close($mysqli);
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

@@ -20,8 +20,4 @@ if (isset($_POST['update_feedback'])) {
 }
 
 mysqli_close($conn);
-<<<<<<< HEAD
 ?>
-=======
-?>
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f

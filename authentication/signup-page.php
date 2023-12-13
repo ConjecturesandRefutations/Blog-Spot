@@ -43,7 +43,7 @@ if (isset($_SESSION['error'])) {
             <!-- Name Input -->
             <input type="text" id="name" name="name" placeholder="username"/>
             <span class="error" id="nameError"></span>
-
+            
             <?php if ($error) : ?>
                 <div class="error">
                     <?php echo $error; ?>

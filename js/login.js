@@ -47,8 +47,4 @@ function validateForm() {
             console.error("Error checking name availability:", error);
             return false;
         });
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d96aab6dda356da9e27216d4541f603d4802e73f
