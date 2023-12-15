@@ -15,8 +15,11 @@ if (isset($_POST['update_feedback'])) {
         echo 'Feedback updated successfully';
     } else {
         // Failure
-        echo 'query error: ' . mysqli_error($conn);
+        echo 'query error: ' . mysqli_error($conn) . ' - Query: ' . $updateFeedbackSql;
     }
+} else {
+    // No data received
+    echo 'No data received for updating feedback';
 }
 
 mysqli_close($conn);

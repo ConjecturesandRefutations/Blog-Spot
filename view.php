@@ -62,19 +62,20 @@ if (isset($_GET['id'])) {
 
     mysqli_free_result($result);
 
-     // Fetch feedback for the current blog post
-     $feedbackSql = "SELECT feedback.*, user.name as feedback_author
-     FROM feedback
-     INNER JOIN user ON feedback.user_id = user.user_id
-     WHERE feedback.blog_id = $id";
-
-$feedbackResult = mysqli_query($conn, $feedbackSql);
-
-// Fetch all feedback results
-$feedback = mysqli_fetch_all($feedbackResult, MYSQLI_ASSOC);
-
-// Free the feedback result
-mysqli_free_result($feedbackResult);
+    // Fetch feedback for the current blog post
+    $feedbackSql = "SELECT feedback.*, user.name as feedback_author
+                    FROM feedback
+                    INNER JOIN user ON feedback.user_id = user.user_id
+                    WHERE feedback.blog_id = $id
+                    ORDER BY feedback.feedback_id DESC";  // Order by feedback ID in descending order
+    
+    $feedbackResult = mysqli_query($conn, $feedbackSql);
+    
+    // Fetch all feedback results
+    $feedback = mysqli_fetch_all($feedbackResult, MYSQLI_ASSOC);
+    
+    // Free the feedback result
+    mysqli_free_result($feedbackResult);
 
     mysqli_close($conn);
 }
@@ -147,7 +148,7 @@ if (isset($_POST['submit_feedback'])) {
 
     <h4 id="editableTitle" class='center' contenteditable="false"><?php echo htmlspecialchars($blog['title']); ?></h4>
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
-    <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <?php echo htmlspecialchars($blog['author_name']); ?></p>
+    <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <a href="profile.php?id=<?php echo $blog['user_id']; ?>"><?php echo htmlspecialchars($blog['author_name']); ?></a></p>
     <p class='center' style='font-style: italic'; contenteditable="false">Created on: <?php echo date('d M Y', strtotime($blog['date'])); ?></p>
     <p id="editableContent" contenteditable="false"><?php echo nl2br(htmlspecialchars($blog['content'])); ?></p>
    
@@ -273,7 +274,7 @@ feedbackButton.addEventListener('click', function() {
 
 document.addEventListener('DOMContentLoaded', function () {
     const editFeedbackButtons = document.querySelectorAll('.edit-feedback-btn');
-    
+
     editFeedbackButtons.forEach(button => {
         button.addEventListener('click', function () {
             const feedbackId = this.getAttribute('data-feedback-id');
@@ -292,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateFeedbackInDatabase(feedbackId, editedFeedbackText) {
         const formData = new FormData();
+        formData.append('update_feedback', '1'); // Add this line to indicate the update_feedback parameter
         formData.append('feedback_id', feedbackId);
         formData.append('edited_feedback_text', editedFeedbackText);
 
@@ -299,19 +301,20 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             body: formData,
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(responseText => {
-            console.log('Feedback updated successfully:', responseText);
-        })
-        .catch(error => {
-            console.error('Error updating feedback:', error);
-            alert('An error occurred during feedback update. Please try again.\n\n' + error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(responseText => {
+                console.log('Feedback updated successfully:', responseText);
+                console.log('Feedback ID:', feedbackId, 'Edited Text:', editedFeedbackText);
+            })
+            .catch(error => {
+                console.error('Error updating feedback:', error);
+                alert('An error occurred during feedback update. Please try again.\n\n' + error);
+            });
     }
 });
 
