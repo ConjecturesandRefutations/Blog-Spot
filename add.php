@@ -97,9 +97,10 @@ if (array_filter($errors)) {
                 <div class="red-text"><?php echo $errors['topic'] ?></div>
             </div>
         </div>
+        <!-- Inside your existing code -->
         <div class="input-field">
-            <label for="content" style="font-size: 14   px;">Blog Content</label>
-            <textarea id="content" name="content" class="materialize-textarea auto-resize" rows="1"><?php echo htmlspecialchars($content) ?></textarea>
+            <label for="content" style="font-size: 14px;">Blog Content</label>
+            <textarea id="content" name="content" class="materialize-textarea auto-resize"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
         </div>
         <div class="center">
