@@ -112,17 +112,18 @@ if (array_filter($errors)) {
 <?php include('templates/footer.php'); ?>
 
 
-<script src="./tinymce/tinymce.min.js"></script>
-<script>
-   tinymce.init({
-      selector: '#content', // ID of your textarea
-      plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
-      toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-      autosave_ask_before_unload: false,
-      height: 300,
-      content_css: [
-         '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-         '//www.tiny.cloud/css/codepen.min.css'
-      ]
+    <script>
+ document.addEventListener('DOMContentLoaded', function () {
+      tinymce.init({
+         selector: '#content',
+         plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+         toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+         autosave_ask_before_unload: false,
+         height: 300,
+         content_css: [
+            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+            '//www.tiny.cloud/css/codepen.min.css'
+         ]
+      });
    });
 </script>
