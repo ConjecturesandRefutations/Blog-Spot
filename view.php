@@ -150,7 +150,7 @@ if (isset($_POST['submit_feedback'])) {
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
     <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <a href="profile.php?id=<?php echo $blog['user_id']; ?>"><?php echo htmlspecialchars($blog['author_name']); ?></a></p>
     <p class='center' style='font-style: italic'; contenteditable="false">Created on: <?php echo date('d M Y', strtotime($blog['date'])); ?></p>
-    <p id="editableContent" contenteditable="false"><?php echo nl2br(html_entity_decode($blog['content'])); ?></p>
+    <p id="editableContent" contenteditable="false"><?php echo nl2br(htmlspecialchars($blog['content'])); ?></p>
    
     <?php else: ?>
 

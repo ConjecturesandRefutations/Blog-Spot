@@ -98,7 +98,7 @@ if (array_filter($errors)) {
             </div>
         </div>
         <div class="input-field">
-            <label for="content" style="font-size: 14px;">Blog Content</label>
+            <label for="">Blog Content</label>
             <textarea id="content" name="content" class="materialize-textarea auto-resize"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
         </div>
@@ -113,7 +113,7 @@ if (array_filter($errors)) {
 
 
     <script>
- document.addEventListener('DOMContentLoaded', function () {
+/*  document.addEventListener('DOMContentLoaded', function () {
       tinymce.init({
          selector: '#content',
          plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
@@ -125,5 +125,5 @@ if (array_filter($errors)) {
             '//www.tiny.cloud/css/codepen.min.css'
          ]
       });
-   });
+   }); */
 </script>
