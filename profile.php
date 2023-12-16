@@ -107,14 +107,25 @@ function calculateWordCount($content) {
     </div>
 </div>
 
-<div class="row">
-    <div class="col s12 m6 offset-m3">
-        <form action="delete_account.php" method="POST" id="deleteAccountForm">
-            <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
-            <button type="submit" class="btn red">Delete My Account</button>
-        </form>
-    </div>
-</div>
+<?php
+// Check if the user is logged in
+if (isset($_SESSION['user_id'])) {
+    // Check if the logged-in user ID matches the profile user ID
+    if ($_SESSION['user_id'] == $profileUser['user_id']) {
+        // Display the delete account button
+?>
+        <div class="row">
+            <div class="col s12 m6 offset-m3">
+                <form action="delete_account.php" method="POST" id="deleteAccountForm">
+                    <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
+                    <button type="submit" class="btn red">Delete My Account</button>
+                </form>
+            </div>
+        </div>
+<?php
+    }
+}
+?>
 
 
 <script>
