@@ -107,7 +107,16 @@ function calculateWordCount($content) {
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<div class="row">
+    <div class="col s12 m6 offset-m3">
+        <form action="delete_account.php" method="POST" id="deleteAccountForm">
+            <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
+            <button type="submit" class="btn red">Delete My Account</button>
+        </form>
+    </div>
+</div>
+
+
 <script>
  $(document).ready(function() {
     $('#search').on('input', function() {
@@ -126,6 +135,15 @@ function calculateWordCount($content) {
         });
     });
 });
+
+$(document).ready(function () {
+        $('#deleteAccountForm').submit(function (e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete your account? This will also delete all your blogs')) {
+                this.submit();
+            }
+        });
+    });
 </script>
 
 <?php include('templates/footer.php'); ?>
