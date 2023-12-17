@@ -42,7 +42,7 @@ if(empty($_POST['content'])){
 if (array_filter($errors)) {
     // echo 'errors in form';
 } else {
-    $title = mysqli_real_escape_string($conn, $_POST['title']);
+    $title = $_POST['title'];
     $content = mysqli_real_escape_string($conn, $_POST['content']);
 
     // set $topic after the conversion
@@ -113,7 +113,7 @@ if (array_filter($errors)) {
 
 
     <script>
-/*  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
       tinymce.init({
          selector: '#content',
          plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
@@ -125,5 +125,5 @@ if (array_filter($errors)) {
             '//www.tiny.cloud/css/codepen.min.css'
          ]
       });
-   }); */
+   }); 
 </script>
