@@ -210,17 +210,20 @@ function toggleEdit() {
         editedContentInput.value = content.innerHTML.trim(); // Trim to remove leading/trailing whitespaces
 
         submitForm(); // Call the submitForm function when saving changes
+
+        // Destroy TinyMCE when leaving edit mode
+        initializeTinyMCE(false);
     } else {
         // If not in edit mode, toggle to edit mode
         title.contentEditable = 'true';
         content.contentEditable = 'true';
+        // Initialize TinyMCE when entering edit mode
+        initializeTinyMCE(true);
 
         editButton.innerHTML = 'Save';
         addBorder(title, content);
     }
 }
-
-
 
 function decodeEntities(encodedString) {
     const textarea = document.createElement('textarea');
@@ -242,14 +245,17 @@ function removeBorder(...elements) {
 }
 
 function submitForm() {
-    console.log('Before fetch');
     const form = document.getElementById('editForm');
     const editedTitleInput = document.getElementById('editedTitle');
     const editedContentInput = document.getElementById('editedContent');
+    const contentEditor = tinymce.get('editableContent'); // Get the TinyMCE editor instance
+
+    // Set the values in the hidden input fields
+    editedTitleInput.value = document.getElementById('editableTitle').innerText.trim();
+    editedContentInput.value = contentEditor.getContent(); // Get content from TinyMCE editor
 
     let formData = new FormData(form);
 
-    console.log('Before fetch request');
     fetch(form.action, {
         method: form.method,
         body: formData,
@@ -270,10 +276,27 @@ function submitForm() {
             console.error('Error in fetch request:', error);
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
-    
-    // Set the innerText directly without line break replacement
-    document.getElementById('editableContent').innerHTML = editedContentInput.value;
 }
+
+
+function initializeTinyMCE(editMode) {
+    if (editMode) {
+        tinymce.init({
+            selector: '#editableContent',
+            plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            autosave_ask_before_unload: false,
+            height: 300,
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tiny.cloud/css/codepen.min.css'
+            ]
+        });
+    } else {
+        tinymce.remove('#editableContent');
+    }
+}
+
 
 let feedbackButton = document.getElementById('feedbackButton');
 let feedbackForm = document.getElementById('feedbackForm');
@@ -331,6 +354,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('An error occurred during feedback update. Please try again.\n\n' + error);
             });
     }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // ... (existing code)
+
+    // Initialize TinyMCE with editMode set to false
+    initializeTinyMCE(false);
 });
 
 
