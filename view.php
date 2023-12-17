@@ -150,7 +150,7 @@ if (isset($_POST['submit_feedback'])) {
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
     <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <a href="profile.php?id=<?php echo $blog['user_id']; ?>"><?php echo htmlspecialchars($blog['author_name']); ?></a></p>
     <p class='center' style='font-style: italic'; contenteditable="false">Created on: <?php echo date('d M Y', strtotime($blog['date'])); ?></p>
-    <p id="editableContent" contenteditable="false"><?php echo nl2br(htmlspecialchars($blog['content'])); ?></p>
+    <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
    
     <?php else: ?>
 
@@ -206,8 +206,8 @@ function toggleEdit() {
         removeBorder(title, content);
 
         // Set the values in the hidden input fields
-        editedTitleInput.value = title.innerText;
-        editedContentInput.value = content.innerText;
+        editedTitleInput.value = title.innerText.trim(); // Trim to remove leading/trailing whitespaces
+        editedContentInput.value = content.innerHTML.trim(); // Trim to remove leading/trailing whitespaces
 
         submitForm(); // Call the submitForm function when saving changes
     } else {
@@ -219,6 +219,15 @@ function toggleEdit() {
         addBorder(title, content);
     }
 }
+
+
+
+function decodeEntities(encodedString) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = encodedString;
+    return textarea.value;
+}
+
 
 function addBorder(...elements) {
     elements.forEach(element => {
@@ -235,6 +244,9 @@ function removeBorder(...elements) {
 function submitForm() {
     console.log('Before fetch');
     const form = document.getElementById('editForm');
+    const editedTitleInput = document.getElementById('editedTitle');
+    const editedContentInput = document.getElementById('editedContent');
+
     let formData = new FormData(form);
 
     console.log('Before fetch request');
@@ -258,6 +270,9 @@ function submitForm() {
             console.error('Error in fetch request:', error);
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
+    
+    // Set the innerText directly without line break replacement
+    document.getElementById('editableContent').innerHTML = editedContentInput.value;
 }
 
 let feedbackButton = document.getElementById('feedbackButton');
