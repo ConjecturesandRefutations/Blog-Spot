@@ -98,8 +98,7 @@ if (array_filter($errors)) {
             </div>
         </div>
         <div class="input-field">
-            <label for="">Blog Content</label>
-            <textarea id="content" name="content" class="materialize-textarea auto-resize"><?php echo htmlspecialchars($content) ?></textarea>
+            <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
         </div>
         <div class="center">
@@ -117,7 +116,7 @@ if (array_filter($errors)) {
       tinymce.init({
          selector: '#content',
          plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
-         toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+         toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
          autosave_ask_before_unload: false,
          height: 300,
          content_css: [

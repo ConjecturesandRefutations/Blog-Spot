@@ -53,7 +53,7 @@ mysqli_close($conn);
             <div class="input-field">
                 <i class="material-icons prefix">search</i></label>
                 <input id="search" type="text" name="search" class="validate white">
-                <label for="search">Search Users by Name or Favourite Topic</label>
+                <label for="search" class="placeholder">Search Users by Name or Favourite Topic</label>
             </div>
         </form>
     </div>

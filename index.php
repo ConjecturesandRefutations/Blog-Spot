@@ -44,18 +44,18 @@ mysqli_close($conn);
 <h4 class='center grey-text'>Feed</h4>
 
 <div class="row">
-    <div class="col s12 m6 offset-m3"> 
+    <div class="col s11 m6 offset-m3"> 
         <form method="GET" action="">
             <div class="input-field">
                 <i class="material-icons prefix">search</i></label>
                 <input id="search" type="text" name="search" class="validate white">
-                <label for="search">Search Blogs by Title, Category, or Author</label>
+                <label for="search" class="placeholder">Search Blogs by Title, Category, or Author</label>
             </div>
         </form>
     </div>
 </div>
 
-<!-- a -->
+
 <div class="container">
     <div class="row d-flex flex-wrap">
     <?php foreach($blogs as $blog): ?>

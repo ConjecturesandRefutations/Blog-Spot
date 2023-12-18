@@ -76,14 +76,6 @@ font-style: italic;
       margin-left: 50px;
   }
   }
-  @media only screen and (max-width: 347px) {
-  .write {
-      position: absolute;
-      top: 100px;
-      left: 20%;
-  }
-  }      
-
 
 /* FOR THE LOGIN PAGE */
 
@@ -305,6 +297,9 @@ font-style: italic;
   margin-bottom: 20px;
 }
 
+#deleteAccountForm{
+    font-size: small;
+}
 
 @media (max-width: 800px) {
   #nav-mobile {
@@ -364,7 +359,17 @@ font-style: italic;
     margin: 0;
     width: 300px;
   }
+  .placeholder{
+      font-size: small !important;
+  }
 }
+
+@media (max-width: 369px) {
+ .placeholder{
+      font-size: x-small !important;
+  }
+}
+
 
 @media (max-width: 360px) {
   .login-card {
@@ -423,3 +428,4 @@ font-style: italic;
     width: 200px;
   }
 }
+

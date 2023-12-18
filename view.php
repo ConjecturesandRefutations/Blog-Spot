@@ -284,7 +284,7 @@ function initializeTinyMCE(editMode) {
         tinymce.init({
             selector: '#editableContent',
             plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
             autosave_ask_before_unload: false,
             height: 300,
             content_css: [
