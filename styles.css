@@ -429,3 +429,12 @@ font-style: italic;
   }
 }
 
+.info {
+  float: left;
+  width: 50%;
+}
+
+.image {
+  float: left;
+  width: 50%;
+}
