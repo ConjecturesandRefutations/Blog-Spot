@@ -4,6 +4,13 @@ $mysqli = require __DIR__ . "/config/db_connect.php";
 $profileUser = null; // Initialize the $profileUser variable
 $searchTerm = '';
 
+if (session_status() == PHP_SESSION_NONE) {
+    // Start the session only if it's not already started
+    session_start();
+}
+
+
+// Check if user_id is provided in the URL
 // Check if user_id is provided in the URL
 if (isset($_GET["id"])) {
     $user_id = $_GET["id"];
@@ -11,7 +18,8 @@ if (isset($_GET["id"])) {
     // Use prepared statement to prevent SQL injection
     $stmt_profile_user = $mysqli->prepare("SELECT user.user_id, user.name, COUNT(blogs.id) as numBlogs, 
                                        SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
-                                       MAX(blogs.topic) as favoriteTopic
+                                       MAX(blogs.topic) as favoriteTopic,
+                                       user.profile_image  -- Include profile_image in the select
                                 FROM user
                                 LEFT JOIN blogs ON user.user_id = blogs.user_id
                                 WHERE user.user_id = ?
@@ -23,6 +31,11 @@ if (isset($_GET["id"])) {
     // Check if the user exists
     if ($result_profile_user && $result_profile_user->num_rows > 0) {
         $profileUser = $result_profile_user->fetch_assoc();
+
+        // Retrieve profile image path from session if available
+        if (isset($_SESSION['profile_image'])) {
+            $profileUser['profile_image'] = $_SESSION['profile_image'];
+        }
     } else {
         header("Location: error_page.php");
         exit();
@@ -59,8 +72,29 @@ if (isset($_GET["id"])) {
     exit();
 }
 
-// Close connection
-mysqli_close($mysqli);
+// ... (previous code)
+
+// Check if a profile image was uploaded
+if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+    $uploadDir = __DIR__ . '/uploads/'; // Use an absolute path for the 'uploads' directory
+    $uploadFile = $uploadDir . basename($_FILES['profile_image']['name']);
+    
+// Move the uploaded file to the specified directory
+move_uploaded_file($_FILES['profile_image']['tmp_name'], $uploadFile);
+
+// Update the database with the relative image path
+$relativeImagePath = 'uploads/' . basename($_FILES['profile_image']['name']);
+$updateImageQuery = "UPDATE user SET profile_image = ? WHERE user_id = ?";
+$stmt_update_image = $mysqli->prepare($updateImageQuery);
+$stmt_update_image->bind_param("si", $relativeImagePath, $user_id);
+$stmt_update_image->execute();
+$stmt_update_image->close();
+
+// Update the $profileUser array with the new relative image path
+$profileUser['profile_image'] = $relativeImagePath;
+$_SESSION['profile_image'] = $relativeImagePath;
+
+}
 
 function calculateWordCount($content) {
     // Count words by counting spaces
@@ -68,14 +102,39 @@ function calculateWordCount($content) {
 
     return $wordCount;
 }
+
+// Close connection
+mysqli_close($mysqli);
 ?>
 
 <?php include('templates/header.php'); ?>
 
-<h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
-<p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
-<p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
-<p class="center grey-text text-darken-2">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+<div class="info">
+    <h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
+    <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
+    <p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
+    <p class="center grey-text text-darken-2">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+</div>
+
+<div class="image">
+    <img src="<?php echo isset($profileUser['profile_image']) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+    <!-- Form for profile image upload -->
+    <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
+        <!-- Add input field for profile image upload -->
+        <div class="input-field col s12">
+            <div class="file-field input-field">
+                <div class="btn">
+                     <span>Select Profile Image</span>
+                     <input type="file" name="profile_image" accept="image/*">
+                </div>
+             <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+             </div>
+        </div>
+    <button type="submit" class="btn">Upload Image</button>
+
+    </form>
+</div>
 
 <div class="row">
     <div class="col s12 m6 offset-m3">
@@ -89,6 +148,7 @@ function calculateWordCount($content) {
         </form>
     </div>
 </div>
+
 
 <div class="container" id="blogList">
     <div class="row">
