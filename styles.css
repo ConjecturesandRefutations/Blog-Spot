@@ -451,3 +451,36 @@ font-style: italic;
   padding: 0;
   background-color: white;
 }
+
+.user-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 50px;
+} 
+
+.img{
+  position: absolute;
+  justify-content: center;
+  left: 20%;
+}
+
+.circle {
+  width: 70px; 
+  height: 70px;
+}
+
+@media (max-width: 450px) {
+  .img {
+    left: 10%;
+  }
+}
+
+@media (max-width: 360px) {
+  .circle{
+    width: 50px; 
+   height: 50px;
+  }
+}
