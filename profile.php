@@ -11,7 +11,6 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
 // Check if user_id is provided in the URL
-// Check if user_id is provided in the URL
 if (isset($_GET["id"])) {
     $user_id = $_GET["id"];
 
@@ -33,8 +32,8 @@ if (isset($_GET["id"])) {
         $profileUser = $result_profile_user->fetch_assoc();
 
         // Retrieve profile image path from session if available
-        if (isset($_SESSION['profile_image'])) {
-            $profileUser['profile_image'] = $_SESSION['profile_image'];
+        if (isset($_SESSION['profile_image'][$user_id])) {
+            $profileUser['profile_image'] = $_SESSION['profile_image'][$user_id];
         }
     } else {
         header("Location: error_page.php");
@@ -72,30 +71,6 @@ if (isset($_GET["id"])) {
     exit();
 }
 
-// ... (previous code)
-
-// Check if a profile image was uploaded
-if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/'; // Use an absolute path for the 'uploads' directory
-    $uploadFile = $uploadDir . basename($_FILES['profile_image']['name']);
-    
-// Move the uploaded file to the specified directory
-move_uploaded_file($_FILES['profile_image']['tmp_name'], $uploadFile);
-
-// Update the database with the relative image path
-$relativeImagePath = 'uploads/' . basename($_FILES['profile_image']['name']);
-$updateImageQuery = "UPDATE user SET profile_image = ? WHERE user_id = ?";
-$stmt_update_image = $mysqli->prepare($updateImageQuery);
-$stmt_update_image->bind_param("si", $relativeImagePath, $user_id);
-$stmt_update_image->execute();
-$stmt_update_image->close();
-
-// Update the $profileUser array with the new relative image path
-$profileUser['profile_image'] = $relativeImagePath;
-$_SESSION['profile_image'] = $relativeImagePath;
-
-}
-
 function calculateWordCount($content) {
     // Count words by counting spaces
     $wordCount = substr_count($content, ' ') + 1;
@@ -109,34 +84,41 @@ mysqli_close($mysqli);
 
 <?php include('templates/header.php'); ?>
 
-<div class="info">
-    <h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
-    <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
-    <p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
-    <p class="center grey-text text-darken-2">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
-</div>
+<div class="wrapping center">
 
-<div class="image">
-    <img src="<?php echo isset($profileUser['profile_image']) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+    <div class="info">
+        <h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
+        <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
+        <p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
+        <p class="center grey-text text-darken-2">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+    </div>
+
+    <div class="image">
+    <img id="profileImagePreview" src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+
     <!-- Form for profile image upload -->
-    <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
+    <form class="" action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
         <!-- Add input field for profile image upload -->
-        <div class="input-field col s12">
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
             <div class="file-field input-field">
-                <div class="btn">
-                     <span>Select Profile Image</span>
-                     <input type="file" name="profile_image" accept="image/*">
+                <div class="waves-effect waves-light select">
+                    <span>Change Profile Image</span>
+                    <input type="file" name="profile_image" id="profile_image_input" accept="image/*" onchange="uploadProfileImage()">
                 </div>
-             <div class="file-path-wrapper">
-                <input class="file-path validate" type="text">
-             </div>
-        </div>
-    <button type="submit" class="btn">Upload Image</button>
-
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+        <?php endif; ?>
     </form>
 </div>
 
-<div class="row">
+
+</div>
+
+
+<!-- Search Bar -->
+<div class="row search-profile">
     <div class="col s12 m6 offset-m3">
         <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
             <div class="input-field col s12">
@@ -150,7 +132,7 @@ mysqli_close($mysqli);
 </div>
 
 
-<div class="container" id="blogList">
+<div class="container center" id="blogList">
     <div class="row">
         <?php foreach($blogs as $blog): ?>
             <div class="col s12 profile-card" style="border: 1px solid grey;" >
@@ -187,6 +169,8 @@ if (isset($_SESSION['user_id'])) {
 }
 ?>
 
+<?php include('templates/footer.php'); ?>
+
 
 <script>
  $(document).ready(function() {
@@ -215,7 +199,43 @@ $(document).ready(function () {
             }
         });
     });
+
+    function uploadProfileImage() {
+    var formData = new FormData($('#profileImageForm')[0]);
+    formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
+
+    $.ajax({
+        type: 'POST',
+        url: 'upload_profile_image.php',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Parse the JSON response
+            var responseData = JSON.parse(response);
+
+            // Handle the response
+            console.log(responseData);
+
+            if (responseData.status === 'success') {
+                // Update the profile image on the page
+                $('#profileImagePreview').attr('src', responseData.profile_image);
+
+                // You may update other information on the page as needed
+                // Example: $('#someElement').text(responseData.someValue);
+            } else {
+                // Handle the error case
+                console.error(responseData.message);
+            }
+        },
+        error: function(error) {
+            // Handle the error
+            console.error(error);
+        }
+    });
+}
+
+
 </script>
 
-<?php include('templates/footer.php'); ?>
 

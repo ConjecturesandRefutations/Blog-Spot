@@ -429,12 +429,18 @@ font-style: italic;
   }
 }
 
-.info {
-  float: left;
-  width: 50%;
+.file-path-wrapper {
+  opacity: 0;
 }
 
-.image {
-  float: left;
-  width: 50%;
+.wrapping{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.image{
+  margin-top: 10px;
 }
