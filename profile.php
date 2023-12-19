@@ -101,7 +101,7 @@ mysqli_close($mysqli);
         <!-- Add input field for profile image upload -->
         <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
             <div class="file-field input-field">
-                <div class="waves-effect waves-light select">
+                <div class="change-image">
                     <span>Change Profile Image</span>
                     <input type="file" name="profile_image" id="profile_image_input" accept="image/*" onchange="uploadProfileImage()">
                 </div>
