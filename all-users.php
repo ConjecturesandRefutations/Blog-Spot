@@ -63,10 +63,10 @@ mysqli_close($conn);
 <div class="container">
     <div class="row" id="user-list">
     <?php foreach ($users as $profileUser) : ?>
-    <div class="col s12" style="border: 1px solid grey;">
+    <div class="col s12 user" style="border: 1px solid grey;">
         <a href="profile.php?id=<?php echo $profileUser['user_id']; ?>" class="card-content grey-text text-darken-2 user-card">
             <div class="img">
-            <img src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="circle">
+            <img src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="circle profile-all">
             </div>
             <div class="user-info">
             <h6 style="font-weight: bold"><?php echo htmlspecialchars($profileUser['name']); ?></h6>
@@ -99,10 +99,10 @@ $(document).ready(function() {
 
                 // Iterate through fetched users and append to the list
                 users.forEach(function(profileUser) {
-                    var userCard = `<div class="col s12" data-user-id="${profileUser.user_id}" style="border: 1px solid grey;">
+                    var userCard = `<div class="col s12 user" data-user-id="${profileUser.user_id}" style="border: 1px solid grey;">
                                 <a href="profile.php?id=${profileUser.user_id}" class="card-content center grey-text text-darken-2 user-card">
                                 <div class="img">
-                                    <img src="${(profileUser.profile_image) ? profileUser.profile_image : 'images/defaultProfile.jpg'}" alt="Profile Image" class="circle">
+                                    <img src="${(profileUser.profile_image) ? profileUser.profile_image : 'images/defaultProfile.jpg'}" alt="Profile Image" class="circle profile-all">
                                 </div>
                                 <div class="user-info">
                                     <h6 class="user-name" style="font-weight: bold">${profileUser.name}</h6>

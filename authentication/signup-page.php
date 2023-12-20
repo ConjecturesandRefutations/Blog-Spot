@@ -28,6 +28,7 @@ if (isset($_SESSION['error'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
     <link rel="stylesheet" href="../styles.css">
+    <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
     <script src="../js/login.js"></script>
 </head>
 <body>

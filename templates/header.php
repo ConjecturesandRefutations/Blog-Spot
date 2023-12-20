@@ -36,7 +36,7 @@ if ($user === null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Spot</title>
     <link rel="stylesheet" href="./styles.css">
-    <link rel="shortcut icon" href="images/favicon.png" type="image/svg+xml">
+    <link rel="shortcut icon" href="./images/favicon.png" type="image/svg+xml">
     <!-- Materialize CSS linked below -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- font awesome -->
