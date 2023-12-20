@@ -34,10 +34,8 @@ if (isset($_POST['id_to_edit'])) {
 
     if (mysqli_query($conn, $sql)) {
         // Success
-        // Optionally, you can redirect or handle success as needed
     } else {
         // Failure
-        // Optionally, you can handle errors or take corrective actions here
         echo 'query error: ' . mysqli_error($conn);
     }
 }
@@ -269,7 +267,6 @@ function submitForm() {
         .then(responseText => {
             console.log('Response Text:', responseText);
 
-            // Handle the response as needed (e.g., display a success message)
         })
         .catch(error => {
             // Handle errors

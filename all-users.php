@@ -90,7 +90,7 @@ $(document).ready(function() {
     function fetchUsers(search) {
         $.ajax({
             type: "GET",
-            url: "fetch_users.php",
+            url: "utilities/fetch_users.php",
             data: { search: search },
             dataType: "json",
             success: function(users) {

@@ -1,6 +1,6 @@
 <?php
 // Include necessary files and initialize database connection if needed
-$mysqli = require __DIR__ . "/config/db_connect.php";
+$mysqli = require __DIR__ . "/../config/db_connect.php";
 
 $searchTerm = '';
 

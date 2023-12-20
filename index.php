@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     blogContainer.innerHTML = xhr.responseText;
                 }
             };
-            xhr.open('GET', 'fetch_blogs.php?search=' + encodeURIComponent(searchValue), true);
+            xhr.open('GET', 'utilities/fetch_blogs.php?search=' + encodeURIComponent(searchValue), true);
             xhr.send();
         });
     });

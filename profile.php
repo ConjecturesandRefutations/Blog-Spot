@@ -181,7 +181,7 @@ if (isset($_SESSION['user_id'])) {
         // Make an AJAX request to update the blog list
         $.ajax({
             type: 'GET',
-            url: 'fetch_user_blogs.php', // Update the URL to the new file
+            url: 'utilities/fetch_user_blogs.php', // Update the URL to the new file
             data: formData,
             success: function(response) {
                 // Replace the content of the blog list
@@ -202,7 +202,7 @@ $(document).ready(function () {
 
     function uploadProfileImage() {
     var formData = new FormData($('#profileImageForm')[0]);
-    formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
+    formData.append('user_id', <?php echo json_encode($profileUser['user_id']); ?>);
 
     $.ajax({
         type: 'POST',
@@ -234,6 +234,7 @@ $(document).ready(function () {
         }
     });
 }
+
 
 
 </script>

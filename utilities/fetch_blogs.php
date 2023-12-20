@@ -1,5 +1,5 @@
 <?php
-include('config/db_connect.php');
+include('../config/db_connect.php');
 
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
