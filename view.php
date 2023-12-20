@@ -354,7 +354,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // ... (existing code)
 
     // Initialize TinyMCE with editMode set to false
     initializeTinyMCE(false);
