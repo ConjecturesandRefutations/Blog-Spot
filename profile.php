@@ -66,7 +66,7 @@ if (isset($_GET["id"])) {
     // Free result from memory
     $stmt_blogs->close();
 } else {
-    echo "User ID not provided";
+    header("Location: authentication/login.php");
     exit();
 }
 
@@ -89,7 +89,7 @@ mysqli_close($mysqli);
         <h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
         <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
         <p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
-        <p class="center grey-text text-darken-2">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+        <p class="center grey-text text-darken-2">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
     </div>
 
     <div class="image">
@@ -123,7 +123,7 @@ mysqli_close($mysqli);
             <div class="input-field col s12">
                 <i class="material-icons prefix">search</i></label>
                 <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-                <label for="search">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
+                <label for="search" class="placeholder">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
             </div>
             <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
         </form>
@@ -159,7 +159,7 @@ if (isset($_SESSION['user_id'])) {
             <div class="col s12 m6 offset-m3">
                 <form action="delete_account.php" method="POST" id="deleteAccountForm">
                     <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
-                    <button type="submit" class="btn red">Delete My Account</button>
+                    <button type="submit" class="btn red z-depth-0">Delete My Account</button>
                 </form>
             </div>
         </div>
@@ -201,7 +201,7 @@ $(document).ready(function () {
 
     function uploadProfileImage() {
     var formData = new FormData($('#profileImageForm')[0]);
-    formData.append('user_id', <?php echo json_encode($profileUser['user_id']); ?>);
+    formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
 
     $.ajax({
         type: 'POST',
@@ -220,7 +220,6 @@ $(document).ready(function () {
                 // Update the profile image on the page
                 $('#profileImagePreview').attr('src', responseData.profile_image);
 
-                // You may update other information on the page as needed
                 // Example: $('#someElement').text(responseData.someValue);
             } else {
                 // Handle the error case
@@ -235,7 +234,4 @@ $(document).ready(function () {
 }
 
 
-
 </script>
-
-

@@ -1,5 +1,6 @@
 <?php
 
+// Set session timeout to 300 minutes
 ini_set('session.gc_maxlifetime', 18000);
 
 // Start the session

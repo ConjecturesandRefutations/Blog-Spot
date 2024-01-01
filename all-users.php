@@ -77,7 +77,7 @@ mysqli_close($conn);
             <h6 style="font-weight: bold"><?php echo htmlspecialchars($profileUser['name']); ?></h6>
             <p style="font-size: smaller">Total Blogs: <?php echo $profileUser['numBlogs']; ?></p>
             <p style="font-size: smaller">Total Words: <?php echo $profileUser['totalWords']; ?></p>
-            <p style="font-size: smaller">Favorite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+            <p style="font-size: smaller">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
             </div>
         </a>
     </div>

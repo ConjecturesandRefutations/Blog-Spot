@@ -301,6 +301,11 @@ font-style: italic;
     font-size: small;
 }
 
+.placeholder{
+    position: absolute !important;
+    left: 3% !important;
+}
+
 @media (max-width: 800px) {
   #nav-mobile {
     display: none !important;
@@ -450,6 +455,11 @@ font-style: italic;
   border-radius: 50px;
   padding: 0;
   background-color: white;
+}
+
+.change-image:hover{
+    background-color: white;
+    background-color: #dddddd;
 }
 
 .user-card {
