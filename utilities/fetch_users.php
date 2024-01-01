@@ -6,10 +6,15 @@ if (isset($_GET['search'])) {
 
     $sql = "SELECT user.user_id, user.name, user.profile_image, COUNT(blogs.id) as numBlogs, 
                    SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
-                   MAX(blogs.topic) as favoriteTopic
+                   COALESCE(favorite_topic.topic, '') as favoriteTopic
             FROM user
             LEFT JOIN blogs ON user.user_id = blogs.user_id
-            WHERE user.name LIKE '%$search%' OR blogs.topic LIKE '%$search%'
+            LEFT JOIN (
+                SELECT user_id, MAX(topic) as topic
+                FROM blogs
+                GROUP BY user_id
+            ) AS favorite_topic ON user.user_id = favorite_topic.user_id
+            WHERE user.name LIKE '%$search%' OR favorite_topic.topic LIKE '%$search%'
             GROUP BY user.user_id, user.name, user.profile_image
             ORDER BY user.name ASC";
 

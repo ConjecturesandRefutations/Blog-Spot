@@ -9,7 +9,6 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-
 // Check if user_id is provided in the URL
 if (isset($_GET["id"])) {
     $user_id = $_GET["id"];

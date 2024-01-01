@@ -34,8 +34,10 @@ if (isset($_POST['id_to_edit'])) {
 
     if (mysqli_query($conn, $sql)) {
         // Success
+        // Optionally, you can redirect or handle success as needed
     } else {
         // Failure
+        // Optionally, you can handle errors or take corrective actions here
         echo 'query error: ' . mysqli_error($conn);
     }
 }
@@ -181,10 +183,9 @@ if (isset($_POST['submit_feedback'])) {
     </div>
 <?php endif; ?>
 
-
-
-
 </div>
+
+<?php include('templates/footer.php'); ?>
 
 <script>
 
@@ -214,7 +215,6 @@ function toggleEdit() {
     } else {
         // If not in edit mode, toggle to edit mode
         title.contentEditable = 'true';
-        content.contentEditable = 'true';
         // Initialize TinyMCE when entering edit mode
         initializeTinyMCE(true);
 
@@ -359,7 +359,4 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeTinyMCE(false);
 });
 
-
 </script>
-
-<?php include('templates/footer.php'); ?>
