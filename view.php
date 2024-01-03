@@ -127,7 +127,7 @@ if (isset($_POST['submit_feedback'])) {
           <button type="button" id="editButton" class="btn orange lighten-3 z-depth-0" onclick="toggleEdit()">Edit</button>
        </form>
 
-        <form action="view.php" method="POST">
+        <form action="view.php" method="POST" onsubmit="return confirmDelete();">
             <input type="hidden" name="id_to_delete" value="<?php echo $blog['id']; ?>">
             <input type="submit" name="delete" value="delete" class="btn red lighten-3 z-depth-0">
         </form>
@@ -358,5 +358,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize TinyMCE with editMode set to false
     initializeTinyMCE(false);
 });
+
+function confirmDelete() {
+    return confirm("Are you sure you want to delete this blog?");
+}
 
 </script>

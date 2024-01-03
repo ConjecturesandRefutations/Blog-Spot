@@ -87,7 +87,7 @@ if (array_filter($errors)) {
     <form action="add.php" method="POST" class="white">
         <div class="row">
             <div class="input-field col s12 m6">
-                <label for="">Blog Title</label>
+                <label for="">Title</label>
                 <input type="text" name="title" value="<?php echo htmlspecialchars($title) ?>">
                 <div class="red-text"><?php echo $errors['title'] ?></div>
             </div>
