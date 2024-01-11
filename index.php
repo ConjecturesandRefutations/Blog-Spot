@@ -59,7 +59,7 @@ mysqli_close($conn);
 <div class="container">
     <div class="row d-flex flex-wrap">
     <?php foreach($blogs as $blog): ?>
-    <div class="col s6">
+    <div class="col s12 m6">
     <a href="view.php?id=<?php echo $blog['id'] ?>" class="card-link"> <!-- Added anchor tag around the card -->
             <div class="card z-depth-0 blog-card">
                 <div class="card-content blog-card-content">

@@ -28,7 +28,7 @@ mysqli_close($conn);
 foreach ($blogs as $blog):
     // Output the HTML structure for each blog item
     ?>
-    <div class="col s6">
+    <div class="col s12 m6">
         <a href="view.php?id=<?php echo $blog['id'] ?>" class="card-link">
             <div class="card z-depth-0 blog-card">
                 <div class="card-content blog-card-content">
