@@ -44,7 +44,7 @@ mysqli_close($conn);
 <h4 class='center grey-text'>Feed</h4>
 
 <div class="row">
-    <div class="col s11 m6 offset-m3"> 
+    <div class="col s11 l6 offset-l3"> 
         <form method="GET" action="">
             <div class="input-field">
                 <i class="material-icons prefix">search</i></label>

@@ -53,7 +53,7 @@ mysqli_close($conn);
 
 <!-- Search Bar -->
 <div class="row">
-    <div class="col s12 m6 offset-m3"> 
+    <div class="col s12 l6 offset-l3"> 
         <form>
             <div class="input-field">
                 <i class="material-icons prefix">search</i></label>

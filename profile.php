@@ -118,7 +118,7 @@ mysqli_close($mysqli);
 
 <!-- Search Bar -->
 <div class="row search-profile">
-    <div class="col s12 m6 offset-m3">
+    <div class="col s12 l6 offset-l3">
         <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
             <div class="input-field col s12">
                 <i class="material-icons prefix">search</i></label>
