@@ -49,7 +49,7 @@ mysqli_close($conn);
             <div class="input-field">
                 <i class="material-icons prefix">search</i></label>
                 <input id="search" type="text" name="search" class="validate white">
-                <label for="search" class="placeholder">Search Blogs by Title, Category, or Author</label>
+                <label for="search" class="placeholder">Search Blogs by Title, Topic, or Author</label>
             </div>
         </form>
     </div>
@@ -67,14 +67,15 @@ mysqli_close($conn);
                     <img src="images/Quill.jpg" class="quill" alt="Image of a quill">
                     <div class='center grey-text' style="font-weight: bold;"><?php echo "Word Count: " . $blog['word_count']; ?></div>
                     <h6 class='center grey-text text-darken-2 blog-title'><?php echo htmlspecialchars($blog['title']); ?></h6>
-                    <p class='center grey-text text-darken-2' style="font-style: italic;"><span id="category">Category: </span><?php echo htmlspecialchars($blog['topic']); ?></p>
-                    <p class='center grey-text text-darken-2' style="font-weight: bold;">Author: <?php echo htmlspecialchars($blog['author_name']); ?></p>
+                    <p class='center grey-text text-darken-2'>Topic: <span style="font-style: italic;"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
+                    <p class='center grey-text text-darken-2'>Author: <span style="font-weight: bold;"><?php echo htmlspecialchars($blog['author_name']); ?></span></p>
                     <div class='center grey-text' style="font-weight: bold;"><?php echo date('d M Y', strtotime($blog['date'])); ?></div>
                 </div>
             </div>
         </a>
     </div>
 <?php endforeach; ?>
+
 
     </div>
 </div>
