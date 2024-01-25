@@ -28,9 +28,10 @@ if (isset($_POST['id_to_edit'])) {
     $id_to_edit = mysqli_real_escape_string($conn, $_POST['id_to_edit']);
     $edited_title = mysqli_real_escape_string($conn, $_POST['title']);
     $edited_content = mysqli_real_escape_string($conn, $_POST['content']);
+    $edited_topic = mysqli_real_escape_string($conn, $_POST['topic']); // Add this line for edited topic
 
     // Perform the update in the database
-    $sql = "UPDATE blogs SET title = '$edited_title', content = '$edited_content' WHERE id = $id_to_edit";
+    $sql = "UPDATE blogs SET title = '$edited_title', content = '$edited_content', topic = '$edited_topic' WHERE id = $id_to_edit";
 
     if (mysqli_query($conn, $sql)) {
         // Success
@@ -41,6 +42,7 @@ if (isset($_POST['id_to_edit'])) {
         echo 'query error: ' . mysqli_error($conn);
     }
 }
+
 
 
 // Check GET request id parameter
@@ -123,6 +125,7 @@ if (isset($_POST['submit_feedback'])) {
     <form id="editForm" action="view.php" method="POST">
           <input type="hidden" name="id_to_edit" value="<?php echo $blog['id']; ?>">
           <input type="hidden" name="title" id="editedTitle" value="<?php echo htmlspecialchars($blog['title']); ?>">
+          <input type="hidden" name="topic" id="editedTopic" value="<?php echo htmlspecialchars($blog['topic']); ?>">
           <input type="hidden" name="content" id="editedContent" value="<?php echo htmlspecialchars($blog['content']); ?>">
           <button type="button" id="editButton" class="btn orange lighten-3 z-depth-0" onclick="toggleEdit()">Edit</button>
        </form>
@@ -149,6 +152,7 @@ if (isset($_POST['submit_feedback'])) {
     <h4 id="editableTitle" class='center' contenteditable="false"><?php echo htmlspecialchars($blog['title']); ?></h4>
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
     <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <a href="profile.php?id=<?php echo $blog['user_id']; ?>"><?php echo htmlspecialchars($blog['author_name']); ?></a></p>
+    <p class='center'>Topic: <span id="editableTopic" contenteditable="false" style="font-style:italic"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
     <p class='center' style='font-style: italic'; contenteditable="false">Created on: <?php echo date('d M Y', strtotime($blog['date'])); ?></p>
     <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
    
@@ -192,36 +196,46 @@ if (isset($_POST['submit_feedback'])) {
 function toggleEdit() {
     const title = document.getElementById('editableTitle');
     const content = document.getElementById('editableContent');
+    const topic = document.getElementById('editableTopic');
     const editedTitleInput = document.getElementById('editedTitle');
     const editedContentInput = document.getElementById('editedContent');
+    const editedTopicInput = document.getElementById('editedTopic');
     const editButton = document.getElementById('editButton');
 
     if (title.contentEditable === 'true') {
         // If in edit mode, toggle back to read-only
         title.contentEditable = 'false';
         content.contentEditable = 'false';
+        topic.contentEditable = 'false';
 
         editButton.innerHTML = 'Edit';
-        removeBorder(title, content);
+        removeBorder(title, content, topic);
 
-        // Set the values in the hidden input fields
-        editedTitleInput.value = title.innerText.trim(); // Trim to remove leading/trailing whitespaces
-        editedContentInput.value = content.innerHTML.trim(); // Trim to remove leading/trailing whitespaces
+        // Extract only the topic text (text after the colon)
+        const topicText = topic.innerText
+        editedTitleInput.value = title.innerText
+        editedContentInput.value = content.innerHTML
+        editedTopicInput.value = topicText;
 
-        submitForm(); // Call the submitForm function when saving changes
+        submitForm();
 
         // Destroy TinyMCE when leaving edit mode
         initializeTinyMCE(false);
     } else {
         // If not in edit mode, toggle to edit mode
         title.contentEditable = 'true';
+        content.contentEditable = 'true';
+        topic.contentEditable = 'true';
+
         // Initialize TinyMCE when entering edit mode
         initializeTinyMCE(true);
 
         editButton.innerHTML = 'Save';
-        addBorder(title, content);
+        addBorder(title, content, topic);
     }
 }
+
+
 
 function decodeEntities(encodedString) {
     const textarea = document.createElement('textarea');
@@ -246,11 +260,13 @@ function submitForm() {
     const form = document.getElementById('editForm');
     const editedTitleInput = document.getElementById('editedTitle');
     const editedContentInput = document.getElementById('editedContent');
-    const contentEditor = tinymce.get('editableContent'); // Get the TinyMCE editor instance
+    const editedTopicInput = document.getElementById('editedTopic');
+    const contentEditor = tinymce.get('editableContent');
 
     // Set the values in the hidden input fields
-    editedTitleInput.value = document.getElementById('editableTitle').innerText.trim();
-    editedContentInput.value = contentEditor.getContent(); // Get content from TinyMCE editor
+    editedTitleInput.value = document.getElementById('editableTitle').innerText;
+    editedContentInput.value = contentEditor.getContent();
+    editedTopicInput.value = document.getElementById('editableTopic').innerText;
 
     let formData = new FormData(form);
 
@@ -266,10 +282,8 @@ function submitForm() {
         })
         .then(responseText => {
             console.log('Response Text:', responseText);
-
         })
         .catch(error => {
-            // Handle errors
             console.error('Error in fetch request:', error);
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
