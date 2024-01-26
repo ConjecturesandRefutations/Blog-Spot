@@ -164,6 +164,7 @@ if (isset($_POST['submit_feedback'])) {
 
 <!-- Display feedback -->
 <?php if (isset($feedback) && !empty($feedback)): ?>
+    <hr>
     <div class="feedback-section center">
         <h5>User Feedback</h5>
         <ul>
