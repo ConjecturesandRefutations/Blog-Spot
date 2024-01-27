@@ -90,7 +90,54 @@ mysqli_close($mysqli);
         <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
         <p class="center grey-text text-darken-2">Total Words: <?php echo $profileUser['totalWords']; ?></p> 
         <p class="center grey-text text-darken-2">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
+
+        <?php
+if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $profileUser['user_id']) {
+    // Display the message button or form
+    
+?>
+    <button class="blue white-text z-depth-0" style="border:none;" onclick="openMessageModal()">Send Message</button>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <h4>Compose Message</h4>
+            <form action="utilities/send_message.php" method="POST" id="messageForm">
+                <input type="hidden" name="recipient_user_id" value="<?php echo $profileUser['user_id']; ?>">
+                <div class="input-field">
+                    <textarea id="message_content" name="message_content" class="materialize-textarea"></textarea>
+                    <label for="message_content">Message</label>
+                </div>
+                <button type="submit" class="btn blue z-depth-0">Send</button>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close btn-flat red" onclick="closeModalAndRefresh()">Cancel</a>
+        </div>
     </div>
+
+<?php
+}
+?>
+<?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
+    <button class="blue white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages</button>
+
+    <!-- See Messages Modal -->
+<div id="seeMessagesModal" class="modal">
+<div class="modal-footer">
+        <a href="#!" class="modal-close red btn-flat">Close</a>
+    </div>
+    <div class="modal-content">
+        <h4>Messages</h4>
+        <div id="messagesContainer">
+            <!-- Messages will be displayed here -->
+        </div>
+    </div>
+
+</div>
+
+<?php endif; ?>
+     </div>
 
     <div class="image">
     <img id="profileImagePreview" src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
@@ -111,7 +158,6 @@ mysqli_close($mysqli);
         <?php endif; ?>
     </form>
 </div>
-
 
 </div>
 
@@ -233,5 +279,136 @@ $(document).ready(function () {
     });
 }
 
+$(document).ready(function(){
+        $('.modal').modal();
+    });
+
+//For toggling the message button
+function openMessageModal() {
+            $('#messageModal').modal('open');
+        }
+
+         // For handling the message form submission
+         $(document).ready(function () {
+    $('#messageForm').submit(function (e) {
+        e.preventDefault();
+
+        // Get the form data
+        var formData = $(this).serialize();
+
+        // Make an AJAX request to handle the message submission
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/send_message.php',
+            data: formData,
+            dataType: 'json',
+            success: function (response) {
+                // Handle the success response
+                console.log(response.status);
+
+                if (response.status === 'success') {
+                    // Display a success message in the modal
+                    $('#messageModal .modal-content').html('<p class="green-text">Message sent successfully!</p>');
+                } else {
+                    // Display an error message in the modal
+                    $('#messageModal .modal-content').html('<p class="red-text">Failed to send message. Please try again.</p>');
+                }
+            },
+            error: function (error) {
+                // Handle the error
+                console.error(error);
+            }
+        });
+    });
+});
+
+    function updateMessagesModal(messages) {
+    var messagesHtml = '';
+
+    // Loop through messages and create HTML
+    for (var i = 0; i < messages.length; i++) {
+        var message = messages[i];
+        var senderUserId = message.sender_user_id;
+        var messageContent = message.message_content;
+        var timestamp = message.timestamp;
+
+        // Format the timestamp (you might need to adjust this based on your timestamp format)
+        var formattedTimestamp = new Date(timestamp).toLocaleString();
+
+        // Add a placeholder for the sender's name
+        messagesHtml += '<div class="message">';
+        messagesHtml += '<p>From: <strong><span class="sender-name" data-userid="' + senderUserId + '">User ID ' + senderUserId + '</span></strong></p>';
+        messagesHtml += '<p>' + messageContent + '</p>';
+        messagesHtml += '<p>' + formattedTimestamp + '</p>';
+        messagesHtml += '</div>';
+    }
+
+    // Update the modal content with the fetched messages
+    $('#messagesContainer').html(messagesHtml);
+
+    // Fetch user details for each sender
+    $('.sender-name').each(function () {
+        var userId = $(this).data('userid');
+        getUserDetails(userId, $(this));
+    });
+}
+
+// Function to fetch user details based on user_id and update the sender name
+function getUserDetails(userId, element) {
+    // Make an AJAX request to fetch user details
+    $.ajax({
+        type: 'GET',
+        url: 'fetch_user_details.php', // Adjust the URL to your PHP script
+        data: { user_id: userId },
+        dataType: 'json',
+        success: function (response) {
+            // Callback to handle the user details response
+            if (response && response.name) {
+                // Update the sender name in the messages modal
+                element.text(response.name);
+            }
+        },
+        error: function (error) {
+            console.error(error);
+        }
+    });
+}
+
+// Function to update messages modal with sender's name
+function updateMessagesModalWithSenderName(html, userId, senderName) {
+    // Find the placeholder and replace it with the sender's name
+    var updatedHtml = html.replace(new RegExp('UserIdPlaceholder' + userId, 'g'), senderName);
+    $('#messagesContainer').html(updatedHtml);
+}
+
+
+function seeMessagesModal() {
+
+            $('#seeMessagesModal').modal('open');
+
+    // Get the user_id of the profile user
+    var profileUserId = <?php echo $profileUser['user_id']; ?>;
+
+    // Make an AJAX request to fetch messages
+    $.ajax({
+        type: 'GET',
+        url: 'fetch_messages.php',
+        data: { user_id: profileUserId },
+        dataType: 'json',
+        success: function (response) {
+            // Update the modal content with the fetched messages
+            updateMessagesModal(response);
+        },
+        error: function (error) {
+            console.error(error);
+        }
+    });
+}
+
+// Function to handle modal close and refresh the page
+function closeModalAndRefresh() {
+    $('#messageModal').modal('close');
+    location.reload();
+}
 
 </script>
