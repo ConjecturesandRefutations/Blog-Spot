@@ -14,6 +14,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: error_page.php");
         exit();
     }
+    
+        // Delete associated messages
+    $stmt_delete_messages = $mysqli->prepare("DELETE FROM messages WHERE sender_user_id = ?");
+    $stmt_delete_messages->bind_param("i", $user_id);
+
+    if (!$stmt_delete_messages->execute()) {
+         echo "Error deleting messages: " . $stmt_delete_messages->error;
+    }
+
+    $stmt_delete_messages->close();
 
     // Perform the deletion
     $stmt_delete_user = $mysqli->prepare("DELETE FROM user WHERE user_id = ?");
