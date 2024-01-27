@@ -16,8 +16,8 @@ button{
   border-radius: 5px;
 }
 
-button:hover,.btn:hover{
-  color: #747474;
+button:hover,.btn:hover,.modal-close:hover{
+  color: #747474 !important;
 }
   .brand{
     background: #cbb09c !important;

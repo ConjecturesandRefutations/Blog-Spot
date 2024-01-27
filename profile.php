@@ -96,7 +96,7 @@
         // Display the message button or form
         
     ?>
-        <button class="blue white-text z-depth-0" style="border:none;" onclick="openMessageModal()">Send Message</button>
+        <button class="blue white-text z-depth-0" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
 
         <!-- Message Modal -->
         <div id="messageModal" class="modal">
@@ -112,7 +112,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close btn-flat red" onclick="closeModalAndRefresh('messageModal')">Cancel</a>
+                <a href="#!" class="modal-close button btn-flat red white-text" onclick="closeModalAndRefresh('messageModal')">Cancel</a>
             </div>
         </div>
 
@@ -120,12 +120,12 @@
     }
     ?>
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-        <button class="secondary white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages</button>
+        <button class="blue white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
 
         <!-- See Messages Modal -->
     <div id="seeMessagesModal" class="modal">
     <div class="modal-footer">
-            <a href="#!" class="modal-close red btn-flat" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
+            <a href="#!" class="modal-close red btn-flat white-text" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
         </div>
         <div class="modal-content">
             <h4>Messages</h4>
@@ -206,7 +206,7 @@
                 <div class="col s12 m6 offset-m3">
                     <form action="utilities/delete_account.php" method="POST" id="deleteAccountForm">
                         <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
-                        <button type="submit" class="btn red z-depth-0">Delete My Account</button>
+                        <button type="submit" class="red z-depth-0 white-text" style="border:none;">Delete My Account</button>
                     </form>
                 </div>
             </div>
@@ -314,7 +314,7 @@
                         $('#messageModal .modal-content').html('<p class="green-text">Message sent successfully!</p>');
                     } else {
                         // Display an error message in the modal
-                        $('#messageModal .modal-content').html('<p class="red-text">Failed to send message. Please try again.</p>');
+                        $('#messageModal .modal-content').html('<p class="red-text strong">Failed to send message. Please try again.</p>');
                     }
                 },
                 error: function (error) {
@@ -444,10 +444,10 @@ function updateUnreadMessagesCount() {
             // Check if there are unread messages
             if (response.unreadCount > 0) {
                 // Update the button text to include the unread count
-                $seeMessagesButton.html('See Messages <span class="red-text text-darken-3">(' + response.unreadCount + ' Unread)</span>');
+                $seeMessagesButton.html('See Messages <span class="red-text text-darken-3">(' + response.unreadCount + ' Unread)</span> <i class="fas fa-envelope"></i>');
             } else {
                 // No unread messages, set the default text
-                $seeMessagesButton.text('See Messages');
+                $seeMessagesButton.html('See Messages <i class="fas fa-envelope"></i>');
             }
         },
         error: function(error) {
