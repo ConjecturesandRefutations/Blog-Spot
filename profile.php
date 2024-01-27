@@ -418,24 +418,6 @@
     $('#seeMessagesModal').modal('open');
 }
 
-// Function to mark messages as read
-function markMessagesAsRead(user_id) {
-    // Make an AJAX request to mark messages as read
-    $.ajax({
-        type: 'POST',
-        url: 'utilities/mark_messages_as_read.php',
-        data: { user_id: user_id },
-        success: function (response) {
-            // Handle the success response if needed
-            console.log(response);
-        },
-        error: function (error) {
-            console.error(error);
-        }
-    });
-}
-
-
     // Function to handle modal close and refresh the page
     function closeModalAndRefresh(modalType) {
     // Close the specified modal
