@@ -43,7 +43,6 @@ if ($user === null) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="./tinymce/tinymce.min.js"></script>
 </head>
@@ -57,15 +56,18 @@ if ($user === null) {
     <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
     <?php endif; ?>
 
-    <?php if (isset($_SESSION["user_id"])) : ?>
-      <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php') : ?>
-          <li><a href="profile.php?id=<?php echo $_SESSION["user_id"]; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
-      <?php endif; ?>
+<?php if (isset($_SESSION["user_id"])) : ?>
+    <?php $loggedInUserId = $_SESSION["user_id"]; ?>
 
-      <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
-          <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
-      <?php endif; ?>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php' || (isset($_GET['id']) && $_GET['id'] != $loggedInUserId)) : ?>
+        <li><a href="profile.php?id=<?php echo $loggedInUserId; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
     <?php endif; ?>
+
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
+        <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
+    <?php endif; ?>
+<?php endif; ?>
+
 
   <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="write btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>   </ul>
     
@@ -78,19 +80,21 @@ if ($user === null) {
   <li><a href="#" class="sidenav-close"><i class="fa fa-times"></i></a></li>
   <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
     <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
-    <?php endif; ?>  
+  <?php endif; ?>  
 
-    <?php if (isset($_SESSION["user_id"])) : ?>
-      <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php') : ?>
-          <li><a href="profile.php?id=<?php echo $_SESSION["user_id"]; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
-      <?php endif; ?>
+  <?php if (isset($_SESSION["user_id"])) : ?>
+    <?php $loggedInUserId = $_SESSION["user_id"]; ?>
 
-      <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
-          <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
-      <?php endif; ?>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php' || (isset($_GET['id']) && $_GET['id'] != $loggedInUserId)) : ?>
+      <li><a href="profile.php?id=<?php echo $loggedInUserId; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
     <?php endif; ?>
 
-      <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
+      <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
+    <?php endif; ?>
+  <?php endif; ?>
+
+  <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>
 </ul>
 
   <script>
