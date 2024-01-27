@@ -1,5 +1,5 @@
 <?php
-include('config/db_connect.php');
+include('../config/db_connect.php');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -12,7 +12,7 @@ if (isset($_POST['delete_feedback'])) {
 
     if (mysqli_query($conn, $deleteFeedbackSql)) {
         // Success
-        header("Location: view.php?id=$blog_id");
+        header("Location: ../view.php?id=$blog_id");
     } else {
         // Failure
         echo 'query error: ' . mysqli_error($conn);
