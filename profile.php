@@ -112,7 +112,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close btn-flat red" onclick="closeModalAndRefresh()">Cancel</a>
+                <a href="#!" class="modal-close btn-flat red" onclick="closeModalAndRefresh('messageModal')">Cancel</a>
             </div>
         </div>
 
@@ -120,12 +120,12 @@
     }
     ?>
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-        <button class="blue white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages</button>
+        <button class="secondary white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages</button>
 
         <!-- See Messages Modal -->
     <div id="seeMessagesModal" class="modal">
     <div class="modal-footer">
-            <a href="#!" class="modal-close red btn-flat">Close</a>
+            <a href="#!" class="modal-close red btn-flat" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
         </div>
         <div class="modal-content">
             <h4>Messages</h4>
@@ -222,7 +222,7 @@
     $(document).ready(function() {
         $('#search').on('input', function() {
             // Get the form data
-            var formData = $('#searchForm').serialize();
+            let formData = $('#searchForm').serialize();
 
             // Make an AJAX request to update the blog list
             $.ajax({
@@ -247,7 +247,7 @@
         });
 
         function uploadProfileImage() {
-        var formData = new FormData($('#profileImageForm')[0]);
+        let formData = new FormData($('#profileImageForm')[0]);
         formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
 
         $.ajax({
@@ -258,7 +258,7 @@
             contentType: false,
             success: function(response) {
                 // Parse the JSON response
-                var responseData = JSON.parse(response);
+                let responseData = JSON.parse(response);
 
                 // Handle the response
                 console.log(responseData);
@@ -284,6 +284,8 @@
             $('.modal').modal();
         });
 
+        
+
     //For toggling the message button
     function openMessageModal() {
                 $('#messageModal').modal('open');
@@ -295,7 +297,7 @@
             e.preventDefault();
 
             // Get the form data
-            var formData = $(this).serialize();
+            let formData = $(this).serialize();
 
             // Make an AJAX request to handle the message submission
             $.ajax({
@@ -324,21 +326,21 @@
     });
 
     function updateMessagesModal(messages) {
-    var messagesHtml = '';
+    let messagesHtml = '';
 
     if (messages.length === 0) {
         // Display "No Messages" if there are no messages
         messagesHtml += '<p>No Messages</p>';
     } else {
         // Loop through messages and create HTML
-        for (var i = 0; i < messages.length; i++) {
-            var message = messages[i];
-            var senderUserId = message.sender_user_id;
-            var messageContent = message.message_content;
-            var timestamp = message.timestamp;
+        for (let i = 0; i < messages.length; i++) {
+            let message = messages[i];
+            let senderUserId = message.sender_user_id;
+            let messageContent = message.message_content;
+            let timestamp = message.timestamp;
 
             // Format the timestamp (you might need to adjust this based on your timestamp format)
-            var formattedTimestamp = new Date(timestamp).toLocaleString();
+            let formattedTimestamp = new Date(timestamp).toLocaleString();
 
             // Placeholder for the sender's name
             messagesHtml += '<div class="message">';
@@ -355,7 +357,7 @@
 
     // Fetch user details for each sender
     $('.sender-name').each(function () {
-        var userId = $(this).data('userid');
+        let userId = $(this).data('userid');
         getUserDetails(userId, $(this));
     });
 }
@@ -385,38 +387,102 @@
     // Function to update messages modal with sender's name
     function updateMessagesModalWithSenderName(html, userId, senderName) {
         // Find the placeholder and replace it with the sender's name
-        var updatedHtml = html.replace(new RegExp('UserIdPlaceholder' + userId, 'g'), senderName);
+        let updatedHtml = html.replace(new RegExp('UserIdPlaceholder' + userId, 'g'), senderName);
         $('#messagesContainer').html(updatedHtml);
     }
 
 
     function seeMessagesModal() {
+    // Get the user_id of the profile user
+    let profileUserId = <?php echo $profileUser['user_id']; ?>;
 
-                $('#seeMessagesModal').modal('open');
+    // Make an AJAX request to fetch messages
+    $.ajax({
+        type: 'GET',
+        url: 'utilities/fetch_messages.php',
+        data: { user_id: profileUserId },
+        dataType: 'json',
+        success: function (response) {
+            // Update the modal content with the fetched messages
+            updateMessagesModal(response.messages);
 
-        // Get the user_id of the profile user
-        var profileUserId = <?php echo $profileUser['user_id']; ?>;
+            // Mark messages as read after fetching and updating the modal
+            markMessagesAsRead(profileUserId);
+        },
+        error: function (error) {
+            console.error(error);
+        }
+    });
 
-        // Make an AJAX request to fetch messages
-        $.ajax({
-            type: 'GET',
-            url: 'utilities/fetch_messages.php',
-            data: { user_id: profileUserId },
-            dataType: 'json',
-            success: function (response) {
-                // Update the modal content with the fetched messages
-                updateMessagesModal(response);
-            },
-            error: function (error) {
-                console.error(error);
-            }
-        });
-    }
+    // Open the modal
+    $('#seeMessagesModal').modal('open');
+}
+
+// Function to mark messages as read
+function markMessagesAsRead(user_id) {
+    // Make an AJAX request to mark messages as read
+    $.ajax({
+        type: 'POST',
+        url: 'utilities/mark_messages_as_read.php',
+        data: { user_id: user_id },
+        success: function (response) {
+            // Handle the success response if needed
+            console.log(response);
+        },
+        error: function (error) {
+            console.error(error);
+        }
+    });
+}
+
 
     // Function to handle modal close and refresh the page
-    function closeModalAndRefresh() {
-        $('#messageModal').modal('close');
+    function closeModalAndRefresh(modalType) {
+    // Close the specified modal
+    $('#' + modalType).modal('close');
+
+    // Check if the modal being closed is the 'messageModal' or 'seeMessagesModal'
+    if (modalType === 'messageModal' || modalType === 'seeMessagesModal') {
+        // Reload the page
         location.reload();
     }
+}
+
+function updateUnreadMessagesCount() {
+    // Make an AJAX request to fetch the unread messages count
+    $.ajax({
+        type: 'GET',
+        url: 'utilities/fetch_unread_count.php',
+        data: { user_id: <?php echo $profileUser['user_id']; ?> }, // Pass the user_id
+        dataType: 'json',
+        success: function(response) {
+            // Get the button element
+            var $seeMessagesButton = $('#seeMessagesButton');
+
+            // Check if there are unread messages
+            if (response.unreadCount > 0) {
+                // Update the button text to include the unread count
+                $seeMessagesButton.html('See Messages <span class="red-text text-darken-3">(' + response.unreadCount + ' Unread)</span>');
+            } else {
+                // No unread messages, set the default text
+                $seeMessagesButton.text('See Messages');
+            }
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    });
+}
+
+
+$(document).ready(function () {
+    // Call the function to update the unread messages count when the page loads
+    updateUnreadMessagesCount();
+
+    // Set up an interval to regularly update the unread messages count
+    setInterval(updateUnreadMessagesCount, 30000); // Update every 30 seconds (adjust as needed)
+});
+
+
 
     </script>
