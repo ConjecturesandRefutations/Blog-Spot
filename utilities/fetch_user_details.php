@@ -1,5 +1,5 @@
 <?php
-$mysqli = require __DIR__ . "/config/db_connect.php";
+$mysqli = require __DIR__ . "/../config/db_connect.php";
 
 // Check if user_id is provided in the GET request
 if (isset($_GET['user_id'])) {

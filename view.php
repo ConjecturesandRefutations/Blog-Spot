@@ -178,7 +178,7 @@ if (isset($_POST['submit_feedback'])) {
                     <?php if ($fb['user_id'] == $loggedInUserId): ?>
                         <!-- Edit and delete options for user's own feedback -->
                         <button type="button" class="btn orange lighten-3 z-depth-0 edit-feedback-btn" data-feedback-id="<?php echo $fb['feedback_id']; ?>">Edit</button>
-                        <form class="delete-feedback-form" action="delete_feedback.php" method="POST" style="display: inline;">
+                        <form class="delete-feedback-form" action="utilities/delete_feedback.php" method="POST" style="display: inline;">
                             <input type="hidden" name="feedback_id" value="<?php echo $fb['feedback_id']; ?>">
                             <input type="hidden" name="blog_id" value="<?php echo $fb['blog_id']; ?>">
                             <button type="submit" name="delete_feedback" class="btn red lighten-3 z-depth-0">Delete</button>
@@ -345,11 +345,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateFeedbackInDatabase(feedbackId, editedFeedbackText) {
         const formData = new FormData();
-        formData.append('update_feedback', '1'); // Add this line to indicate the update_feedback parameter
+        formData.append('update_feedback', '1'); // Indicate the update_feedback parameter
         formData.append('feedback_id', feedbackId);
         formData.append('edited_feedback_text', editedFeedbackText);
 
-        fetch('update_feedback.php', {
+        fetch('utilities/update_feedback.php', {
             method: 'POST',
             body: formData,
         })
