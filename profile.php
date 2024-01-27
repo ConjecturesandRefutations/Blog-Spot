@@ -395,7 +395,7 @@
                 $('#seeMessagesModal').modal('open');
 
         // Get the user_id of the profile user
-        var profileUserId = <?php echo $profileUser['user_id']; ?>;
+        let profileUserId = <?php echo $profileUser['user_id']; ?>;
 
         // Make an AJAX request to fetch messages
         $.ajax({
