@@ -15,7 +15,6 @@ button{
   font-size: larger;
   border-radius: 5px;
 }
-
 button:hover,.btn:hover,.modal-close:hover{
   color: #747474 !important;
 }

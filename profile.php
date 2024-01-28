@@ -96,7 +96,7 @@
         // Display the message button or form
         
     ?>
-        <button class="secondary z-depth-0 button hov" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
+        <button class="secondary z-depth-0 button hov white-text" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
 
         <!-- Message Modal -->
         <div id="messageModal" class="modal">
@@ -112,7 +112,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close btn-flat white-text red hov" onclick="closeModalAndRefresh('messageModal')">Close</a>
+                <a href="#!" class="modal-close btn-flat red hov white-text" onclick="closeModalAndRefresh('messageModal')">Close</a>
             </div>
         </div>
 
@@ -120,12 +120,12 @@
     }
     ?>
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-        <button class="secondary z-depth-0 hov" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
+        <button class="secondary z-depth-0 hov white-text" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
 
         <!-- See Messages Modal -->
     <div id="seeMessagesModal" class="modal">
     <div class="modal-footer">
-            <a href="#!" class="modal-close red btn-flat white-text hov" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
+            <a href="#!" class="modal-close red btn-flat white-text" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
         </div>
         <div class="modal-content">
             <h4>Messages</h4>
@@ -206,7 +206,7 @@
                 <div class="col s12 m6 offset-m3">
                     <form action="utilities/delete_account.php" method="POST" id="deleteAccountForm">
                         <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
-                        <button type="submit" class="red z-depth-0 white-text hov" style="border:none;">Delete My Account</button>
+                        <button type="submit" class="red z-depth-0 white-text" style="border:none;">Delete My Account</button>
                     </form>
                 </div>
             </div>
@@ -293,36 +293,40 @@
 
             // For handling the message form submission
             $(document).ready(function () {
-        $('#messageForm').submit(function (e) {
-            e.preventDefault();
+        // For handling the message form submission
+$(document).ready(function () {
+    $('#messageForm').submit(function (e) {
+        e.preventDefault();
 
-            // Get the form data
-            let formData = $(this).serialize();
+        // Get the form data
+        let formData = $(this).serialize();
 
-            // Make an AJAX request to handle the message submission
-            $.ajax({
-                type: 'POST',
-                url: 'utilities/send_message.php',
-                data: formData,
-                dataType: 'json',
-                success: function (response) {
-                    // Handle the success response
-                    console.log(response.status);
+        // Make an AJAX request to handle the message submission
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/send_message.php',
+            data: formData,
+            dataType: 'json',
+            success: function (response) {
+                // Handle the success response
+                console.log(response.status);
 
-                    if (response.status === 'success') {
-                        // Display a success message in the modal
-                        $('#messageModal .modal-content').html('<p class="green-text">Message sent successfully!</p>');
-                    } else {
-                        // Display an error message in the modal
-                        $('#messageModal .modal-content').html('<p class="red-text strong">Failed to send message. Please try again.</p>');
-                    }
-                },
-                error: function (error) {
-                    // Handle the error
-                    console.error(error);
+                if (response.status === 'success') {
+                    // Display a success message in the modal
+                    $('#messageModal .modal-content').html('<p class="green-text">Message sent successfully!</p>');
+                } else {
+                    // Display the specific error message returned by the server
+                    $('#messageModal .modal-content').html('<p class="red-text strong">' + response.message + '</p>');
                 }
-            });
+            },
+            error: function (error) {
+                // Handle the error
+                console.error(error);
+            }
         });
+    });
+});
+
     });
 
     function updateMessagesModal(messages) {
@@ -496,4 +500,4 @@ $(document).ready(function() {
 });
 
 
-    </script>
+</script>
