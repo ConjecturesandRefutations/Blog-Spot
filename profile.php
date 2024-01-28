@@ -1,4 +1,4 @@
-    <?php
+<?php
     $mysqli = require __DIR__ . "/config/db_connect.php";
 
     $profileUser = null; // Initialize the $profileUser variable
@@ -96,7 +96,7 @@
         // Display the message button or form
         
     ?>
-        <button class="blue white-text z-depth-0" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
+        <button class="secondary z-depth-0 button hov" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
 
         <!-- Message Modal -->
         <div id="messageModal" class="modal">
@@ -108,11 +108,11 @@
                         <textarea id="message_content" name="message_content" class="materialize-textarea"></textarea>
                         <label for="message_content">Message</label>
                     </div>
-                    <button type="submit" class="btn blue z-depth-0">Send</button>
+                    <button type="submit" class="btn blue z-depth-0">Send <i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close button btn-flat red white-text" onclick="closeModalAndRefresh('messageModal')">Cancel</a>
+                <a href="#!" class="modal-close btn-flat white-text red hov" onclick="closeModalAndRefresh('messageModal')">Close</a>
             </div>
         </div>
 
@@ -120,12 +120,12 @@
     }
     ?>
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-        <button class="blue white-text z-depth-0" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
+        <button class="secondary z-depth-0 hov" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
 
         <!-- See Messages Modal -->
     <div id="seeMessagesModal" class="modal">
     <div class="modal-footer">
-            <a href="#!" class="modal-close red btn-flat white-text" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
+            <a href="#!" class="modal-close red btn-flat white-text hov" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
         </div>
         <div class="modal-content">
             <h4>Messages</h4>
@@ -170,7 +170,7 @@
                 <div class="input-field col s12">
                     <i class="material-icons prefix">search</i></label>
                     <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-                    <label for="search" class="placeholder">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
+                    <label for="search" class="profile-placeholder">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
                 </div>
                 <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
             </form>
@@ -206,7 +206,7 @@
                 <div class="col s12 m6 offset-m3">
                     <form action="utilities/delete_account.php" method="POST" id="deleteAccountForm">
                         <input type="hidden" name="user_id" value="<?php echo $profileUser['user_id']; ?>">
-                        <button type="submit" class="red z-depth-0 white-text" style="border:none;">Delete My Account</button>
+                        <button type="submit" class="red z-depth-0 white-text hov" style="border:none;">Delete My Account</button>
                     </form>
                 </div>
             </div>
@@ -338,6 +338,7 @@
             let senderUserId = message.sender_user_id;
             let messageContent = message.message_content;
             let timestamp = message.timestamp;
+            let messageID = message.message_id
 
             // Format the timestamp (you might need to adjust this based on your timestamp format)
             let formattedTimestamp = new Date(timestamp).toLocaleString();
@@ -347,6 +348,7 @@
             messagesHtml += '<p>From: <strong><span class="sender-name" data-userid="' + senderUserId + '">User ID ' + senderUserId + '</span></strong></p>';
             messagesHtml += '<p>' + messageContent + '</p>';
             messagesHtml += '<p>' + formattedTimestamp + '</p>';
+            messagesHtml += '<button class="red delete-message white-text" style="border: none" data-message-id="' + messageID + '">Delete</button>'
             messagesHtml += '<hr>'
             messagesHtml += '</div>';
         }
@@ -406,8 +408,6 @@
             // Update the modal content with the fetched messages
             updateMessagesModal(response.messages);
 
-            // Mark messages as read after fetching and updating the modal
-            markMessagesAsRead(profileUserId);
         },
         error: function (error) {
             console.error(error);
@@ -447,7 +447,7 @@ function updateUnreadMessagesCount() {
                 $seeMessagesButton.html('See Messages <span class="red-text text-darken-3">(' + response.unreadCount + ' Unread)</span> <i class="fas fa-envelope"></i>');
             } else {
                 // No unread messages, set the default text
-                $seeMessagesButton.html('See Messages <i class="fas fa-envelope"></i>');
+                $seeMessagesButton.html('See Messages <i class="fas fa-envelope-open"></i>');
             }
         },
         error: function(error) {
@@ -465,6 +465,35 @@ $(document).ready(function () {
     setInterval(updateUnreadMessagesCount, 30000); // Update every 30 seconds (adjust as needed)
 });
 
+$(document).ready(function() {
+    // Add an event listener for the delete buttons
+    $(document).on('click', '.delete-message', function() {
+        // Get the message ID from the data attribute
+        let messageId = $(this).data('message-id');
+
+        console.log('Clicked Delete for Message ID:', messageId);
+
+
+        // Make an AJAX request to delete the message
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/delete_message.php',
+            data: { message_id: messageId },
+            dataType: 'json',
+            success: function(response) {
+                // Handle the success response
+                console.log(response);
+
+                // Reload the messages modal after deletion
+                seeMessagesModal();
+            },
+            error: function(error) {
+                // Handle the error
+                console.error(error);
+            }
+        });
+    });
+});
 
 
     </script>
