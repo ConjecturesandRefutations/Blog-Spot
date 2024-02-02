@@ -99,9 +99,8 @@ if (array_filter($errors)) {
             <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
         </div>
-        <div class="center">
-            <input type="submit" name='submit' value="Submit" class="btn brand z-depth-0">
-        </div>
+            <input type="submit" name='draft' value="Draft" class="btn grey z-depth-0">
+            <input type="submit" name='submit' value="Publish" class="submit btn brand z-depth-0">
     </form>
 </section>
 

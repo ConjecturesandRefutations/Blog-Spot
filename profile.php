@@ -165,17 +165,26 @@
 
     <!-- Search Bar -->
     <div class="row search-profile">
-        <div class="col s12 l6 offset-l3">
-            <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
-                <div class="input-field col s12">
-                    <i class="material-icons prefix">search</i></label>
-                    <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-                    <label for="search" class="profile-placeholder">Search <?php echo htmlspecialchars($profileUser['name']); ?>'s Blogs by Title or Topic</label>
-                </div>
-                <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
-            </form>
-        </div>
+    <div class="col s12 l6 offset-l3">
+        <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
+            <div class="input-field col s12">
+                <i class="material-icons prefix">search</i>
+                <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
+                <label for="search" class="profile-placeholder">
+                    <?php
+                    if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
+                        echo "Search Your Blogs by Title or Topic";
+                    } else {
+                        echo "Search " . htmlspecialchars($profileUser['name']) . "'s Blogs by Title or Topic";
+                    }
+                    ?>
+                </label>
+            </div>
+            <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
+        </form>
     </div>
+</div>
+
 
 
     <div class="container center" id="blogList">
