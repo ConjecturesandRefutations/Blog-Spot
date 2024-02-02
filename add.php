@@ -62,7 +62,6 @@ if (array_filter($errors)) {
     $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date) VALUES (?, ?, ?, ?, NOW())");
     $stmt->bind_param("ssss", $title, $topic, $content, $userId);
 
-
         // execute the statement
         if ($stmt->execute()) {
             // success
@@ -77,7 +76,6 @@ if (array_filter($errors)) {
     }
 }
 // end POST check
-
 ?>
 
 <?php include('templates/header.php'); ?>
@@ -107,9 +105,7 @@ if (array_filter($errors)) {
     </form>
 </section>
 
-
 <?php include('templates/footer.php'); ?>
-
 
     <script>
   document.addEventListener('DOMContentLoaded', function () {

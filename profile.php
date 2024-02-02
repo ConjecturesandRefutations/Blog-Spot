@@ -434,6 +434,13 @@ $(document).ready(function () {
     }
 }
 
+ $(document).ready(function () {
+    $('.modal').modal({
+        closeMethods: ['button', 'overlay'],
+        dismissible: false,
+    });
+}); 
+
 function updateUnreadMessagesCount() {
     // Make an AJAX request to fetch the unread messages count
     $.ajax({

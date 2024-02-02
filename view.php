@@ -43,8 +43,6 @@ if (isset($_POST['id_to_edit'])) {
     }
 }
 
-
-
 // Check GET request id parameter
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -148,7 +146,6 @@ if (isset($_POST['submit_feedback'])) {
     </form>
 <?php endif; ?>
 
-
     <h4 id="editableTitle" class='center' contenteditable="false"><?php echo htmlspecialchars($blog['title']); ?></h4>
     <hr>
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
@@ -238,8 +235,6 @@ function toggleEdit() {
     }
 }
 
-
-
 function decodeEntities(encodedString) {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = encodedString;
@@ -291,7 +286,6 @@ function submitForm() {
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
 }
-
 
 function initializeTinyMCE(editMode) {
     if (editMode) {
