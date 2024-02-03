@@ -44,7 +44,7 @@ mysqli_close($conn);
 
 <?php include('templates/header.php'); ?>
 
-<h4 class='center grey-text'>All Blogs</h4>
+<h4 class='center grey-text'>All Users' Blogs</h4>
 
 <div class="row">
     <div class="col s11 l6 offset-l3"> 
