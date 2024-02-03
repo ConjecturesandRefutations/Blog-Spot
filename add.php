@@ -67,11 +67,16 @@ if (array_filter($errors)) {
         // execute the statement
         if ($stmt->execute()) {
             // success
-            header('Location: index.php');
+            if ($isDraft) {
+                header("Location: drafts.php?id=" . $_SESSION['user_id']);
+            } else {
+                header('Location: index.php');
+            }
         } else {
             // error
             echo 'query error: ' . $stmt->error;
         }
+        
 
         // close the statement
         $stmt->close();
