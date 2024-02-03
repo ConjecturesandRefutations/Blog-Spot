@@ -15,7 +15,7 @@
 
         // Use prepared statement to prevent SQL injection
         $stmt_profile_user = $mysqli->prepare("SELECT user.user_id, user.name, COUNT(blogs.id) as numBlogs, 
-                                        SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
+                                        SUM(CASE WHEN blogs.is_draft = 0 THEN LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1 ELSE 0 END) as totalWords,
                                         MAX(blogs.topic) as favoriteTopic,
                                         user.profile_image  -- Include profile_image in the select
                                     FROM user
@@ -47,11 +47,11 @@
         }
 
         // Fetch blogs for the user with search functionality
-        $stmt_blogs = $mysqli->prepare("SELECT blogs.title, blogs.date, blogs.content, blogs.id, blogs.topic, user.user_id, user.name as author_name
+        $stmt_blogs = $mysqli->prepare("SELECT blogs.title, blogs.date, blogs.last_updated, blogs.content, blogs.id, blogs.topic, user.user_id, user.name as author_name
             FROM blogs
             INNER JOIN user ON blogs.user_id = user.user_id
-            WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?)
-            ORDER BY blogs.date DESC, blogs.id DESC");
+            WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?) AND blogs.is_draft = 0
+            ORDER BY COALESCE(blogs.last_updated, blogs.date) DESC, blogs.id DESC");
         $likeParam = "%$searchTerm%";
         $stmt_blogs->bind_param("iss", $user_id, $likeParam, $likeParam);
         $stmt_blogs->execute();
@@ -84,7 +84,6 @@
     <?php include('templates/header.php'); ?>
 
     <div class="wrapping center">
-
         <div class="info">
             <h4 class='center grey-text text-darken-2'><?php echo htmlspecialchars($profileUser['name']); ?></h4>
             <p class="center grey-text text-darken-2">Total Blogs: <?php echo $numBlogs; ?></p>
@@ -171,6 +170,7 @@
                 <i class="material-icons prefix">search</i>
                 <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
                 <label for="search" class="profile-placeholder">
+
                     <?php
                     if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
                         echo "Search Your Blogs by Title or Topic";
@@ -185,10 +185,18 @@
     </div>
 </div>
 
-
-
     <div class="container center" id="blogList">
         <div class="row">
+        <h5 class='center grey-text'>                     <?php
+                    if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
+                        echo "Your Blogs";
+                    } else {
+                        echo "" . htmlspecialchars($profileUser['name']) . "'s Blogs";
+                    }
+                    ?></h5>
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
+            <a href="drafts.php?id=<?php echo $loggedInUserId; ?>" class="left underline">See Drafts</a>
+            <?php endif; ?>
             <?php foreach($blogs as $blog): ?>
                 <div class="col s12 profile-card" style="border: 1px solid grey;" >
                     <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
@@ -196,7 +204,8 @@
                             <h6 style="font-weight: bold"><?php echo htmlspecialchars($blog['title']); ?></h6>
                             <p style="font-size: smaller">Topic: <?php echo htmlspecialchars($blog['topic']); ?></p>
                             <p style="font-size: smaller">Word Count: <?php echo calculateWordCount($blog['content']); ?></p>
-                            <p style="font-size: smaller">Created on <?php echo date('d-m-Y', strtotime($blog['date'])); ?></p>
+                            <p style="font-size: smaller">Created On: <?php echo date('d-m-Y', strtotime($blog['date'])); ?></p>
+                            <p style="font-size: smaller">Last Updated: <?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></p>
                         </div>
                     </a>
                 </div>
@@ -228,6 +237,7 @@
 
 
     <script>
+
     $(document).ready(function() {
         $('#search').on('input', function() {
             // Get the form data
@@ -514,6 +524,5 @@ $(document).ready(function() {
         });
     });
 });
-
 
 </script>

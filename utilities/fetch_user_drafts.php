@@ -4,13 +4,6 @@ $mysqli = require __DIR__ . "/../config/db_connect.php";
 
 $searchTerm = '';
 
-if (session_status() == PHP_SESSION_NONE) {
-    // Start the session only if it's not already started
-    session_start();
-}
-
-$loggedInUserId = $_SESSION["user_id"];
-
 // Check if user_id is provided in the URL
 if (isset($_GET["id"])) {
     $user_id = $_GET["id"];
@@ -24,7 +17,7 @@ if (isset($_GET["id"])) {
     $stmt_blogs = $mysqli->prepare("SELECT blogs.title, blogs.date, blogs.content, blogs.id, blogs.topic, user.user_id, user.name as author_name
         FROM blogs
         INNER JOIN user ON blogs.user_id = user.user_id
-        WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?)
+        WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?) AND blogs.is_draft = 1
         ORDER BY blogs.date DESC, blogs.id DESC");
     $likeParam = "%$searchTerm%";
     $stmt_blogs->bind_param("iss", $user_id, $likeParam, $likeParam);
@@ -43,7 +36,7 @@ if (isset($_GET["id"])) {
     }
     ?>
     <div class="row">
-        <a href="drafts.php?id=<?php echo $loggedInUserId; ?>" class="left underline">See Drafts</a>
+    <a href="drafts.php?id=<?php echo $user_id; ?>" class="left underline">See Drafts</a>
         <?php foreach($blogs as $blog): ?>
             <div class="col s12" style="border: 1px solid grey;" >
                 <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
@@ -69,4 +62,3 @@ if (isset($_GET["id"])) {
 // Close connection
 mysqli_close($mysqli);
 ?>
-

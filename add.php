@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_id'])) {
 $title = $topic = $content = '';
 $errors = array('title' =>'', 'topic'=>'', 'content' => '');
 
-    if(isset($_POST['submit'])){
+    if(isset($_POST['submit']) || isset($_POST['draft']))   {
     
 //check title
 if(empty($_POST['title'])){
@@ -58,9 +58,11 @@ if (array_filter($errors)) {
 
     $userId = $_SESSION['user_id']; 
 
+    $isDraft = isset($_POST['draft']) ? 1 : 0;
+
     // Use prepared statement
-    $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date) VALUES (?, ?, ?, ?, NOW())");
-    $stmt->bind_param("ssss", $title, $topic, $content, $userId);
+    $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date, is_draft) VALUES (?, ?, ?, ?, NOW(), ?)");
+    $stmt->bind_param("ssssi", $title, $topic, $content, $userId, $isDraft);
 
         // execute the statement
         if ($stmt->execute()) {
@@ -99,8 +101,9 @@ if (array_filter($errors)) {
             <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
         </div>
-            <input type="submit" name='draft' value="Draft" class="btn grey z-depth-0">
-            <input type="submit" name='submit' value="Publish" class="submit btn brand z-depth-0">
+            <input type="hidden" name="action" value="draft">
+            <input type="submit" name='draft' value="Save Draft" class="btn grey z-depth-0">
+            <input type="submit" name='submit' value="Publish" class="btn green z-depth-0">
     </form>
 </section>
 

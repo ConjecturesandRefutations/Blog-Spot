@@ -484,10 +484,8 @@ font-style: italic;
   height: 70px !important;
 }
 
-.submit{
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%);
+.underline{
+  text-decoration: underline;
 }
 
 @media (max-width: 450px) {
