@@ -13,17 +13,20 @@ include('config/db_connect.php');
 
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-
-// A query to fetch blogs with user information
+// A query to fetch published blogs with user information
 $sql = "SELECT blogs.title, blogs.date, blogs.id, blogs.topic, user.user_id, user.name as author_name,
-                SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) AS word_count
+                COALESCE(SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1), 0) AS word_count,
+                COALESCE(blogs.last_updated, blogs.date) AS last_updated
          FROM blogs
          INNER JOIN user ON blogs.user_id = user.user_id
-         WHERE blogs.title LIKE '%$search%'
+         WHERE (blogs.title LIKE '%$search%'
             OR user.name LIKE '%$search%'
-            OR blogs.topic LIKE '%$search%'
+            OR blogs.topic LIKE '%$search%')
+            AND blogs.is_draft = 0  -- Include only published blogs
          GROUP BY blogs.id
-         ORDER BY blogs.date DESC, blogs.id DESC";
+         ORDER BY last_updated DESC, blogs.id DESC";
+
+
 
 // Make the query and get the result
 $result = mysqli_query($conn, $sql);
@@ -41,7 +44,7 @@ mysqli_close($conn);
 
 <?php include('templates/header.php'); ?>
 
-<h4 class='center grey-text'>Feed</h4>
+<h4 class='center grey-text'>All Blogs</h4>
 
 <div class="row">
     <div class="col s11 l6 offset-l3"> 
@@ -67,9 +70,10 @@ mysqli_close($conn);
                     <img src="images/Quill.jpg" class="quill" alt="Image of a quill">
                     <div class='center grey-text' style="font-weight: bold;"><?php echo "Word Count: " . $blog['word_count']; ?></div>
                     <h6 class='center grey-text text-darken-2 blog-title'><?php echo htmlspecialchars($blog['title']); ?></h6>
-                    <p class='center grey-text text-darken-2'>Topic: <span style="font-style: italic;"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
+                    <p class='center grey-text text-darken-2'>Topic: <span style="font-weight: bold;"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
                     <p class='center grey-text text-darken-2'>Author: <span style="font-weight: bold;"><?php echo htmlspecialchars($blog['author_name']); ?></span></p>
-                    <div class='center grey-text' style="font-weight: bold;"><?php echo date('d M Y', strtotime($blog['date'])); ?></div>
+                    <div class='center grey-text text-darken-2'>Created: <span><?php echo date('d M Y', strtotime($blog['date'])); ?></span></div>
+                    <div class='center grey-text text-darken-2'>Last Updated: <span><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></div>
                 </div>
             </div>
         </a>

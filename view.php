@@ -9,6 +9,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+
 if (isset($_POST['delete'])) {
     $id_to_delete = mysqli_real_escape_string($conn, $_POST['id_to_delete']);
 
@@ -31,14 +32,40 @@ if (isset($_POST['id_to_edit'])) {
     $edited_topic = mysqli_real_escape_string($conn, $_POST['topic']); // Add this line for edited topic
 
     // Perform the update in the database
-    $sql = "UPDATE blogs SET title = '$edited_title', content = '$edited_content', topic = '$edited_topic' WHERE id = $id_to_edit";
+    $sql = "UPDATE blogs SET title = '$edited_title', content = '$edited_content', topic = '$edited_topic', last_updated = CURRENT_TIMESTAMP WHERE id = $id_to_edit";
 
     if (mysqli_query($conn, $sql)) {
-        // Success
-        // Optionally, you can redirect or handle success as needed
+    } else {
+        echo 'query error: ' . mysqli_error($conn);
+    }
+}
+
+if (isset($_POST['publish'])) {
+    $id_to_publish = mysqli_real_escape_string($conn, $_POST['id_to_publish']);
+
+    // Update the 'is_draft' property to 0
+    $publishSql = "UPDATE blogs SET is_draft = 0, last_updated = CURRENT_TIMESTAMP WHERE id = $id_to_publish";
+
+    if (mysqli_query($conn, $publishSql)) {
+        header('Location: index.php');
+        exit();
     } else {
         // Failure
-        // Optionally, you can handle errors or take corrective actions here
+        echo 'query error: ' . mysqli_error($conn);
+    }
+}
+
+if (isset($_POST['draft'])) {
+    $id_to_draft = mysqli_real_escape_string($conn, $_POST['id_to_draft']);
+
+    // Update the 'is_draft' property to 1
+    $draftSql = "UPDATE blogs SET is_draft = 1, last_updated = CURRENT_TIMESTAMP WHERE id = $id_to_draft";
+
+    if (mysqli_query($conn, $draftSql)) {
+        header("Location: drafts.php?id=" . $_SESSION['user_id']);
+        exit();
+    } else {
+        // Failure
         echo 'query error: ' . mysqli_error($conn);
     }
 }
@@ -133,6 +160,22 @@ if (isset($_POST['submit_feedback'])) {
             <input type="submit" name="delete" value="delete" class="btn red lighten-3 z-depth-0">
         </form>
 
+        <?php if ($blog['is_draft'] == 1): ?>
+            <!-- Display 'Publish' button only if is_draft is set to 1 -->
+            <form action="view.php" method="POST" class="publish">
+                <input type="hidden" name="id_to_publish" value="<?php echo $blog['id']; ?>">
+                <button type="submit" name="publish" class="btn green lighten-3 z-depth-0">Publish</button>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($blog['is_draft'] == 0): ?>
+            <!-- Display 'Publish' button only if is_draft is set to 0 -->
+            <form action="view.php" method="POST">
+                <input type="hidden" name="id_to_draft" value="<?php echo $blog['id']; ?>">
+                <button type="submit" name="draft" class="btn brand lighten-3 z-depth-0">Draft</button>
+            </form>
+        <?php endif; ?>
+
     </div>
 
 <?php endif; ?>
@@ -151,7 +194,8 @@ if (isset($_POST['submit_feedback'])) {
     <p class='center grey-text word-count' style='font-weight: bold;'>Word Count: <?php echo $blog['word_count']; ?></p>
     <p class='center grey-text text-darken-3' style="font-weight: bold;">Author: <a href="profile.php?id=<?php echo $blog['user_id']; ?>"><?php echo htmlspecialchars($blog['author_name']); ?></a></p>
     <p class='center'>Topic: <span id="editableTopic" contenteditable="false" style="font-style:italic"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
-    <p class='center' contenteditable="false">Created on: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
+    <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
+    <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
     <hr>
     <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
    
