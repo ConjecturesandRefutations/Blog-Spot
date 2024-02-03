@@ -185,6 +185,7 @@
     </div>
 </div>
 
+
     <div class="container center" id="blogList">
         <div class="row">
         <h5 class='center grey-text'>                     <?php
@@ -486,7 +487,6 @@ function updateUnreadMessagesCount() {
     });
 }
 
-
 $(document).ready(function () {
     // Call the function to update the unread messages count when the page loads
     updateUnreadMessagesCount();
@@ -502,7 +502,6 @@ $(document).ready(function() {
         let messageId = $(this).data('message-id');
 
         console.log('Clicked Delete for Message ID:', messageId);
-
 
         // Make an AJAX request to delete the message
         $.ajax({
@@ -523,6 +522,10 @@ $(document).ready(function() {
             }
         });
     });
+
 });
+=======
+})
+
 
 </script>
