@@ -12,10 +12,11 @@ if (isset($_GET['search'])) {
                 SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
                 COALESCE(favorite_topic.topic, '') as favoriteTopic
             FROM user
-            LEFT JOIN blogs ON user.user_id = blogs.user_id
+            LEFT JOIN blogs ON user.user_id = blogs.user_id AND blogs.is_draft = 0
             LEFT JOIN (
                 SELECT user_id, MAX(topic) as topic
                 FROM blogs
+                WHERE is_draft = 0
                 GROUP BY user_id
             ) AS favorite_topic ON user.user_id = favorite_topic.user_id
             WHERE user.name LIKE '%$search%' OR favorite_topic.topic LIKE '%$search%'
@@ -27,11 +28,10 @@ if (isset($_GET['search'])) {
                 SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
                 MAX(blogs.topic) as favoriteTopic
             FROM user
-            LEFT JOIN blogs ON user.user_id = blogs.user_id
+            LEFT JOIN blogs ON user.user_id = blogs.user_id AND blogs.is_draft = 0
             GROUP BY user.user_id, user.name, user.profile_image
             ORDER BY user.name ASC";
 }
-
 
 // Make the query and get the result
 $result = mysqli_query($conn, $sql);
