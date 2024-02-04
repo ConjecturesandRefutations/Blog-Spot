@@ -567,4 +567,40 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.send-reply', function() {
+    let messageId = $(this).data('message-id');
+    let replyContent = $('#replyTextarea_' + messageId).val();
+
+    // Make an AJAX request to send the reply
+    $.ajax({
+        type: 'POST',
+        url: 'utilities/send_message.php',
+        data: {
+            recipient_user_id: <?php echo $profileUser['user_id']; ?>,
+            message_content: replyContent,
+            parent_message_id: messageId
+        },
+        dataType: 'json',
+
+                   // Inside the success callback for sending a reply
+success: function (response) {
+    // Handle the success response
+    console.log(response.status);
+
+    if (response.status === 'success') {
+        // Display a success message in the modal
+        $('#seeMessagesModal .modal-content').html('<p class="green-text">' + response.message + '</p>');
+    } else {
+        // Display the specific error message returned by the server
+        $('#seeMessagesModal .modal-content').html('<p class="red-text strong">' + response.message + '</p>');
+    }
+},
+
+        error: function(error) {
+            // Handle the error
+            console.error(error);
+        }
+    });
+});
+
 </script>
