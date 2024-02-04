@@ -371,7 +371,9 @@ $(document).ready(function () {
             messagesHtml += '<p>From: <strong><span class="sender-name" data-userid="' + senderUserId + '">User ID ' + senderUserId + '</span></strong></p>';
             messagesHtml += '<p>' + messageContent + '</p>';
             messagesHtml += '<p>' + formattedTimestamp + '</p>';
-            messagesHtml += '<button class="red delete-message white-text" style="border: none" data-message-id="' + messageID + '">Delete</button>'
+            messagesHtml += '<button class="red delete-message white-text left" style="border: none" data-message-id="' + messageID + '">Delete</button>'
+            messagesHtml += '<button class="blue reply-message white-text" style="margin-right: 50px; border:none" data-message-id="' + messageID + '">Reply</button>'
+            messagesHtml += '<div id="messagesContainer"><!-- Messages will be displayed here --> </div>'
             messagesHtml += '<hr>'
             messagesHtml += '</div>';
         }
@@ -524,5 +526,45 @@ $(document).ready(function() {
         });
     });
 });
+
+$(document).ready(function() {
+        // Add an event listener for the reply buttons
+        $(document).on('click', '.reply-message', function() {
+            // Get the message ID from the data attribute
+            let messageId = $(this).data('message-id');
+
+            // Create a textarea element for the reply
+            let replyTextarea = '<textarea class="materialize-textarea" id="replyTextarea_' + messageId + '" placeholder="Type your reply here"></textarea>';
+
+            // Create a 'Send' button
+            let sendButton = '<button class="blue send-reply white-text" style="border: none" data-message-id="' + messageId + '">Send <i class="fas fa-paper-plane"></button>';
+
+            // Append the textarea and 'Send' button after the clicked 'reply' button
+            $(this).after(replyTextarea + sendButton);
+
+            // Update the 'reply' button to 'Cancel' for user feedback
+            $(this).text('Cancel');
+
+            // Remove the 'reply' class and add 'cancel-reply' for further handling
+            $(this).removeClass('reply-message').addClass('cancel-reply');
+
+        });
+
+        // Add an event listener for the cancel-reply buttons
+        $(document).on('click', '.cancel-reply', function() {
+            // Get the message ID from the data attribute
+            let messageId = $(this).data('message-id');
+
+            // Remove the appended textarea and 'Send' button
+            $('#replyTextarea_' + messageId).remove();
+            $('.send-reply').remove();
+
+            // Update the button back to 'reply'
+            $(this).text('Reply');
+
+            // Remove the 'cancel-reply' class and add 'reply-message'
+            $(this).removeClass('cancel-reply').addClass('reply-message');
+        });
+    });
 
 </script>
