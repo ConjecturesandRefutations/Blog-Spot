@@ -21,23 +21,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        // Use prepared statement to prevent SQL injection
-        $stmt_insert_message = $mysqli->prepare("INSERT INTO messages (sender_user_id, receiver_user_id, message_content) VALUES (?, ?, ?)");
-        $stmt_insert_message->bind_param("iis", $sender_user_id, $recipient_user_id, $message_content);
+      // Check if it's a reply to an existing message
+if (isset($_POST['parent_message_id'])) {
+    $parent_message_id = $_POST['parent_message_id'];
 
-        // Execute the prepared statement
-        if ($stmt_insert_message->execute()) {
-            // Message inserted successfully
-            $stmt_insert_message->close();
-            mysqli_close($mysqli);
-            echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
-            exit();
-        } else {
-            // Error inserting message
-            $stmt_insert_message->close();
-            mysqli_close($mysqli);
-            echo json_encode(['status' => 'error', 'message' => 'Error sending message.', 'mysqli_error' => mysqli_error($mysqli)]);
-            exit();
+    // Retrieve the first four words of the parent message
+    $stmt_select_parent_message = $mysqli->prepare("SELECT SUBSTRING_INDEX(message_content, ' ', 4) AS first_four_words FROM messages WHERE message_id = ?");
+    $stmt_select_parent_message->bind_param("i", $parent_message_id);
+    $stmt_select_parent_message->execute();
+    $stmt_select_parent_message->bind_result($first_four_words);
+    $stmt_select_parent_message->fetch();
+    $stmt_select_parent_message->close();
+
+    // Check if the message content already contains "Replying to"
+    $replying_to_added = false;
+    if (strpos($message_content, 'Replying to') === false) {
+        // Append the new "Replying to" prefix
+        $message_content = 'Replying to "' . $first_four_words . '...' . '"<br>' . $message_content;
+        $replying_to_added = true;
+    }
+
+    // Use a single query to insert both the original message and the reply
+    $stmt_insert_reply = $mysqli->prepare("INSERT INTO messages (sender_user_id, receiver_user_id, message_content, parent_message_id) 
+                                        SELECT ?, sender_user_id, ?, ? FROM messages WHERE message_id = ? AND sender_user_id <> ?");
+    $stmt_insert_reply->bind_param("isisi", $sender_user_id, $message_content, $parent_message_id, $parent_message_id, $sender_user_id);
+
+    // Execute the prepared statement for a reply
+    if ($stmt_insert_reply->execute()) {
+        // Reply inserted successfully
+        $stmt_insert_reply->close();
+
+        mysqli_close($mysqli);
+        echo json_encode(['status' => 'success', 'message' => 'Reply sent successfully.']);
+        exit();
+    } else {
+        // Error inserting reply
+        $stmt_insert_reply->close();
+        mysqli_close($mysqli);
+        echo json_encode(['status' => 'error', 'message' => 'Error sending reply.', 'mysqli_error' => mysqli_error($mysqli)]);
+        exit();
+    }
+}
+
+
+ else {
+            // It's a new message
+            $stmt_insert_message = $mysqli->prepare("INSERT INTO messages (sender_user_id, receiver_user_id, message_content) VALUES (?, ?, ?)");
+            $stmt_insert_message->bind_param("iis", $sender_user_id, $recipient_user_id, $message_content);
+
+            // Execute the prepared statement for a new message
+            if ($stmt_insert_message->execute()) {
+                // Message inserted successfully
+                $inserted_message_id = $stmt_insert_message->insert_id;
+                $stmt_insert_message->close();
+
+                mysqli_close($mysqli);
+                echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
+                exit();
+            } else {
+                // Error inserting message
+                $stmt_insert_message->close();
+                mysqli_close($mysqli);
+                echo json_encode(['status' => 'error', 'message' => 'Error sending message.', 'mysqli_error' => mysqli_error($mysqli)]);
+                exit();
+            }
         }
     } else {
         // User not logged in

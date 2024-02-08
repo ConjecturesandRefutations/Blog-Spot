@@ -48,10 +48,10 @@
 
         // Fetch blogs for the user with search functionality
         $stmt_blogs = $mysqli->prepare("SELECT blogs.title, blogs.date, blogs.last_updated, blogs.content, blogs.id, blogs.topic, user.user_id, user.name as author_name
-            FROM blogs
-            INNER JOIN user ON blogs.user_id = user.user_id
-            WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?) AND blogs.is_draft = 0
-            ORDER BY COALESCE(blogs.last_updated, blogs.date) DESC, blogs.id DESC");
+        FROM blogs
+        INNER JOIN user ON blogs.user_id = user.user_id
+        WHERE blogs.user_id = ? AND (blogs.title LIKE ? OR blogs.topic LIKE ?) AND blogs.is_draft = 0
+        ORDER BY COALESCE(blogs.last_updated, blogs.date) DESC, blogs.id DESC");
         $likeParam = "%$searchTerm%";
         $stmt_blogs->bind_param("iss", $user_id, $likeParam, $likeParam);
         $stmt_blogs->execute();
@@ -60,22 +60,37 @@
         // Fetch the resulting rows as an array
         $blogs = $result_blogs->fetch_all(MYSQLI_ASSOC);
 
+        // Recalculate the total word count for all the user's blogs combined
+        $totalWords = 0;
+        foreach ($blogs as $blog) {
+            // Calculate the word count for each blog content
+            $wordCount = calculateWordCount($blog['content']);
+            // Add the word count of the current blog to the total words
+            $totalWords += $wordCount;
+        }
+
+
         // Get the number of blogs
         $numBlogs = count($blogs);
 
         // Free result from memory
         $stmt_blogs->close();
+
     } else {
         header("Location: authentication/login.php");
         exit();
     }
 
     function calculateWordCount($content) {
+        // Remove HTML tags from the content
+        $contentWithoutTags = strip_tags($content);
+    
         // Count words by counting spaces
-        $wordCount = substr_count($content, ' ') + 1;
-
+        $wordCount = str_word_count($contentWithoutTags);
+    
         return $wordCount;
     }
+    
 
     // Close connection
     mysqli_close($mysqli);

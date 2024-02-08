@@ -85,7 +85,16 @@ if (isset($_GET['id'])) {
     $result = mysqli_query($conn, $sql);
 
     // Fetch result in array format
-    $blog = mysqli_fetch_assoc($result);
+    $blog = mysqli_fetch_assoc($result);    
+
+    // Strip HTML tags from the content
+    $stripped_content = strip_tags($blog['content']);
+
+    // Count words in stripped content
+    $word_count = str_word_count($stripped_content);
+    
+    // Add word count to the $blog array
+    $blog['word_count'] = $word_count;
 
     mysqli_free_result($result);
 
