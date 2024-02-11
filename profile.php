@@ -38,7 +38,7 @@
             header("Location: error_page.php");
             exit();
         }
-
+        
         $stmt_profile_user->close();
 
         // Check if the search term is provided
@@ -67,8 +67,8 @@
             $wordCount = calculateWordCount($blog['content']);
             // Add the word count of the current blog to the total words
             $totalWords += $wordCount;
+            $profileUser['totalWords'] = $totalWords;
         }
-
 
         // Get the number of blogs
         $numBlogs = count($blogs);
