@@ -4,9 +4,15 @@
     font-family: poppins, consolas;
 }
 
-body{
-  margin: 0;
+html{
+  overflow-x: hidden !important;
 }
+
+body{
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
 
 button{
   cursor: pointer;
