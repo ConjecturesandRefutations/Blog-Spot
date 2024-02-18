@@ -66,7 +66,6 @@ function calculateWordCount($content) {
     </div>
 </div>
 
-<!-- Add the missing container -->
 <div class="container">
     <div class="row" id="user-list">
     <?php foreach ($users as $profileUser) : ?>
