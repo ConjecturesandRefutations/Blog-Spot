@@ -9,23 +9,15 @@ if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, $_GET['search']);
 
     $sql = "SELECT user.user_id, user.name, user.profile_image, COUNT(blogs.id) as numBlogs, 
-                SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
-                COALESCE(favorite_topic.topic, '') as favoriteTopic
+                MAX(blogs.topic) as favoriteTopic
             FROM user
             LEFT JOIN blogs ON user.user_id = blogs.user_id AND blogs.is_draft = 0
-            LEFT JOIN (
-                SELECT user_id, MAX(topic) as topic
-                FROM blogs
-                WHERE is_draft = 0
-                GROUP BY user_id
-            ) AS favorite_topic ON user.user_id = favorite_topic.user_id
-            WHERE user.name LIKE '%$search%' OR favorite_topic.topic LIKE '%$search%'
+            WHERE user.name LIKE '%$search%' OR blogs.topic LIKE '%$search%'
             GROUP BY user.user_id, user.name, user.profile_image
             ORDER BY user.name ASC";
 } else {
     // Default query without search
     $sql = "SELECT user.user_id, user.name, user.profile_image, COUNT(blogs.id) as numBlogs, 
-                SUM(LENGTH(blogs.content) - LENGTH(REPLACE(blogs.content, ' ', '')) + 1) as totalWords,
                 MAX(blogs.topic) as favoriteTopic
             FROM user
             LEFT JOIN blogs ON user.user_id = blogs.user_id AND blogs.is_draft = 0
@@ -45,6 +37,16 @@ mysqli_free_result($result);
 // Close connection
 mysqli_close($conn);
 
+// Function to calculate word count with HTML tags stripped
+function calculateWordCount($content) {
+    // Remove HTML tags from the content
+    $contentWithoutTags = strip_tags($content);
+    
+    // Count words by counting spaces
+    $wordCount = str_word_count($contentWithoutTags);
+    
+    return $wordCount;
+}
 ?>
 
 <?php include('templates/header.php'); ?>
@@ -76,7 +78,17 @@ mysqli_close($conn);
             <div class="user-info">
             <h6 style="font-weight: bold"><?php echo htmlspecialchars($profileUser['name']); ?></h6>
             <p style="font-size: smaller">Total Blogs: <?php echo $profileUser['numBlogs']; ?></p>
-            <p style="font-size: smaller">Total Words: <?php echo $profileUser['totalWords']; ?></p>
+            <!-- Calculate and display total words -->
+            <?php 
+            $totalWords = 0;
+            // Fetch blogs for the user
+            $blogsResult = mysqli_query($conn, "SELECT content FROM blogs WHERE user_id = {$profileUser['user_id']} AND is_draft = 0");
+            while ($blog = mysqli_fetch_assoc($blogsResult)) {
+                $totalWords += calculateWordCount($blog['content']);
+            }
+            mysqli_free_result($blogsResult);
+            ?>
+            <p style="font-size: smaller">Total Words: <?php echo $totalWords; ?></p>
             <p style="font-size: smaller">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
             </div>
         </a>
@@ -88,7 +100,7 @@ mysqli_close($conn);
 
 <?php include('templates/footer.php'); ?>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     // Function to fetch and display users in real-time
@@ -112,6 +124,7 @@ $(document).ready(function() {
                                 <div class="user-info">
                                     <h6 class="user-name" style="font-weight: bold">${profileUser.name}</h6>
                                     <p class="num-blogs" style="font-size: smaller">Total Blogs: ${profileUser.numBlogs}</p>
+                                    <!-- Calculate and display total words -->
                                     <p class="total-words" style="font-size: smaller">Total Words: ${profileUser.totalWords}</p>
                                     <p class="favorite-topic" style="font-size: smaller">Favorite Topic: ${profileUser.favoriteTopic}</p>
                                 </div>

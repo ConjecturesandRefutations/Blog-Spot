@@ -1,4 +1,5 @@
 <?php
+
     $mysqli = require __DIR__ . "/config/db_connect.php";
 
     $profileUser = null; // Initialize the $profileUser variable
