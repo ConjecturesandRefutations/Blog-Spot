@@ -58,10 +58,6 @@ margin-top: 50px
 font-style: italic;
 }   
 
-.header{
-  top: 0;
-}
-
 .blog-card{
   height: 400px;
 }
@@ -283,10 +279,14 @@ font-style: italic;
   width: 30px;
 }
 
-.fixed{
-  top: 0;
-  position: sticky;
+.sticky {
+  position: relative; 
   z-index: 999;
+}
+
+.sticked {
+  position: fixed;
+  top: 0;
 }
 
 .favicon{
@@ -306,10 +306,7 @@ font-style: italic;
     font-size: small;
 }
 
-.placeholder{
-    position: absolute !important;
-    left: 3% !important;
-}
+.placeholder{ position: absolute !important; left: 3% !important; } .profile-placeholder{ position: absolute !important; left: 5% !important; }
 
 @media (max-width: 800px) {
   #nav-mobile {

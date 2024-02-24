@@ -1,146 +1,123 @@
 <?php
-
+if (session_status() == PHP_SESSION_NONE) {
+    // Start the session only if it's not already started
+    session_start();
+}
 $user = null; // Initialize the $user variable
 
 if (isset($_SESSION["user_id"])) {
-    $mysqli = require __DIR__ . "/config/db_connect.php";
+    $mysqli = require __DIR__ . "/../config/db_connect.php";
     $sql = "SELECT * FROM user WHERE user_id = {$_SESSION["user_id"]}";
     $result = $mysqli->query($sql);
     $user = $result->fetch_assoc();
 }
 
-include('config/db_connect.php');
-
-$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
-
-// A query to fetch published blogs with user information
-$sql = "SELECT DISTINCT blogs.title, blogs.content, blogs.date, blogs.id, blogs.topic, user.user_id, user.name as author_name,
-                COALESCE(blogs.last_updated, blogs.date) AS last_updated
-         FROM blogs
-         INNER JOIN user ON blogs.user_id = user.user_id
-         WHERE (blogs.title LIKE '%$search%'
-            OR user.name LIKE '%$search%'
-            OR blogs.topic LIKE '%$search%')
-            AND blogs.is_draft = 0  -- Include only published blogs
-         GROUP BY blogs.id
-         ORDER BY last_updated DESC, blogs.id DESC";
-
-// Make the query and get the result
-$result = mysqli_query($conn, $sql);
-
-// Calculate word count for each blog after stripping HTML tags
-$blogs = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    // Calculate word count for the blog after stripping HTML tags
-    $row['word_count'] = str_word_count(strip_tags($row['content']));
-    // Append the row to the $blogs array
-    $blogs[] = $row;
+// Display the message only if the user is logged out
+if ($user === null) {
+    echo '<div class="login-advice">';
+    echo '<div class="col s12">';
+    echo '<div class="card red lighten-3">';
+    echo '<div class="card-content">';
+    echo '<p class="center grey-text text-darken-3" style="font-weight: bold;">';
+    echo 'You are in browsing mode. You must LOGIN to create, edit, and delete your own blogs.';
+    echo '</p>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }
-
-// Free result from memory
-mysqli_free_result($result);
-
-// Close connection
-mysqli_close($conn);
-
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Spot</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
+    <!-- Materialize CSS linked below -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="./tinymce/tinymce.min.js"></script>
+</head>
+<body class="grey lighten-4">
+<nav class="white z-depth-0 sticky header">
+    <div class="container">
+    <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
+    <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
+    <ul id='nav-mobile' class="right">
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
+    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
+    <?php endif; ?>
 
-<?php include('templates/header.php'); ?>
+<?php if (isset($_SESSION["user_id"])) : ?>
+    <?php $loggedInUserId = $_SESSION["user_id"]; ?>
 
-<h4 class='center grey-text'>All Users' Blogs</h4>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php' || (isset($_GET['id']) && $_GET['id'] != $loggedInUserId)) : ?>
+        <li><a href="profile.php?id=<?php echo $loggedInUserId; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
+    <?php endif; ?>
 
-<div class="row">
-    <div class="col s11 l6 offset-l3"> 
-        <form method="GET" action="">
-            <div class="input-field">
-                <i class="material-icons prefix">search</i></label>
-                <input id="search" type="text" name="search" class="validate white">
-                <label for="search" class="placeholder">Search Blogs by Title, Topic, or Author</label>
-            </div>
-        </form>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
+        <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
+    <?php endif; ?>
+<?php endif; ?>
+
+
+  <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="write btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>   </ul>
+    
+    <a href="#" data-target="mobile-nav" class="sidenav-trigger" id="burger-anchor"><img src="images/burger.png" alt="burger menu" class="fa fa-bars black-text" id="burger-img"></a>
     </div>
-</div>
+</nav>
 
-<div class="container">
-    <div class="row d-flex flex-wrap">
-    <?php foreach($blogs as $blog): ?>
-    <div class="col s12 m6">
-    <a href="view.php?id=<?php echo $blog['id'] ?>" class="card-link"> <!-- Added anchor tag around the card -->
-            <div class="card z-depth-0 blog-card">
-                <div class="card-content blog-card-content">
-                    <img src="images/favicon.png" class="favicon" alt="favicon">
-                    <img src="images/Quill.jpg" class="quill" alt="Image of a quill">
-                    <div class='center grey-text' style="font-weight: bold;"><?php echo "Word Count: " . $blog['word_count']; ?></div>
-                    <h6 class='center grey-text text-darken-2 blog-title'><?php echo htmlspecialchars($blog['title']); ?></h6>
-                    <p class='center grey-text text-darken-2'>Topic: <span style="font-weight: bold;"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
-                    <p class='center grey-text text-darken-2'>Author: <span style="font-weight: bold;"><?php echo htmlspecialchars($blog['author_name']); ?></span></p>
-                    <div class='center grey-text text-darken-2'>Created: <span><?php echo date('d M Y', strtotime($blog['date'])); ?></span></div>
-                    <div class='center grey-text text-darken-2'>Last Updated: <span><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></div>
-                </div>
-            </div>
-        </a>
-    </div>
-<?php endforeach; ?>
+<!-- Mobile Navigation -->
+<ul class="sidenav grey lighten-2" id="mobile-nav">
+  <li><a href="#" class="sidenav-close"><i class="fa fa-times"></i></a></li>
+  <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
+    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
+  <?php endif; ?>  
 
+  <?php if (isset($_SESSION["user_id"])) : ?>
+    <?php $loggedInUserId = $_SESSION["user_id"]; ?>
 
-    </div>
-</div>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'profile.php' || (isset($_GET['id']) && $_GET['id'] != $loggedInUserId)) : ?>
+      <li><a href="profile.php?id=<?php echo $loggedInUserId; ?>" class="profile btn pink lighten-4 z-depth-0">Profile</a></li>
+    <?php endif; ?>
 
-<?php include('templates/footer.php'); ?>
+    <?php if (basename($_SERVER['PHP_SELF']) !== 'add.php') : ?>
+      <li><a href="add.php" class="write btn brand z-depth-0">Write a Blog</a></li>
+    <?php endif; ?>
+  <?php endif; ?>
 
-<script>
-function truncateText(element, maxLines) {
-    // Get the line height and font size of the element
-    var computedStyle = window.getComputedStyle(element);
-    var lineHeight = parseFloat(computedStyle.lineHeight);
-    var fontSize = parseFloat(computedStyle.fontSize);
+  <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>
+</ul>
 
-    // Calculate the maximum height based on the number of lines
-    var maxHeight = lineHeight * maxLines;
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let elems = document.querySelectorAll('.sidenav');
+      let instances = M.Sidenav.init(elems);
+    });
+    
+window.addEventListener('scroll', function() {
+    let stickyElement = document.querySelector('.sticky');
+    let container = document.querySelector('.container');
+    let containerRect = container.getBoundingClientRect();
 
-    // Set the max-height and overflow properties
-    element.style.maxHeight = maxHeight + 'px';
-    element.style.overflow = 'hidden';
-    element.style.display = '-webkit-box';
-    element.style.WebkitBoxOrient = 'vertical';
+    let threshold = 25; 
 
-    // Check if truncation is applied
-    if (element.offsetHeight > element.parentNode.offsetHeight) {
-        // Add ellipsis if truncation is applied
-        element.style.textOverflow = 'ellipsis';
+    if (window.pageYOffset >= (containerRect.top + threshold)) {
+      stickyElement.classList.add('sticked');
+    } else {
+      stickyElement.classList.remove('sticked');
     }
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    var blogTitles = document.querySelectorAll('.blog-title');
-
-    blogTitles.forEach(function (title) {
-        truncateText(title, 9);
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-        var searchInput = document.getElementById('search');
-        var blogContainer = document.querySelector('.row.d-flex.flex-wrap');
-
-        searchInput.addEventListener('input', function () {
-            var searchValue = searchInput.value.trim();
-
-            // Use AJAX to fetch and update blogs based on the search input
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Replace the current blogs with the fetched ones
-                    blogContainer.innerHTML = xhr.responseText;
-                }
-            };
-            xhr.open('GET', 'utilities/fetch_blogs.php?search=' + encodeURIComponent(searchValue), true);
-            xhr.send();
-        });
-    });
-
-</script>
+  });
 
 
-</html>
+  </script>
