@@ -61,7 +61,6 @@ mysqli_close($conn);
     </div>
 </div>
 
-
 <div class="container">
     <div class="row d-flex flex-wrap">
     <?php foreach($blogs as $blog): ?>
