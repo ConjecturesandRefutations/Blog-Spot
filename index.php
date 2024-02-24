@@ -14,7 +14,7 @@ include('config/db_connect.php');
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
 // A query to fetch published blogs with user information
-$sql = "SELECT blogs.title, blogs.content, blogs.date, blogs.id, blogs.topic, user.user_id, user.name as author_name,
+$sql = "SELECT DISTINCT blogs.title, blogs.content, blogs.date, blogs.id, blogs.topic, user.user_id, user.name as author_name,
                 COALESCE(blogs.last_updated, blogs.date) AS last_updated
          FROM blogs
          INNER JOIN user ON blogs.user_id = user.user_id
@@ -28,12 +28,13 @@ $sql = "SELECT blogs.title, blogs.content, blogs.date, blogs.id, blogs.topic, us
 // Make the query and get the result
 $result = mysqli_query($conn, $sql);
 
-// Fetch the resulting rows as an array
-$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
 // Calculate word count for each blog after stripping HTML tags
-foreach ($blogs as &$blog) {
-    $blog['word_count'] = str_word_count(strip_tags($blog['content']));
+$blogs = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    // Calculate word count for the blog after stripping HTML tags
+    $row['word_count'] = str_word_count(strip_tags($row['content']));
+    // Append the row to the $blogs array
+    $blogs[] = $row;
 }
 
 // Free result from memory
