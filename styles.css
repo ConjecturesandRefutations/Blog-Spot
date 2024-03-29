@@ -270,10 +270,6 @@ font-style: italic;
 
 #burger-anchor,#burger-img{
   display: none !important;
-  top: 50%;
-  transform: translate(0,-50%);
-  height: 30px;
-  width: 30px;
 }
 
 .sticky {
@@ -314,6 +310,9 @@ font-style: italic;
     display: block !important;
     position: absolute;
     right: 30px;
+    top: 7px;
+    height: 30px;
+    width: 30px;
   }
 }
 
@@ -493,4 +492,9 @@ font-style: italic;
     width: 50px !important; 
    height: 50px !important;
   }
+}
+
+.featured_image{
+  margin: 0 !important;
+  padding: 0 !important;
 }

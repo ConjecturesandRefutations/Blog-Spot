@@ -64,7 +64,6 @@ if (array_filter($errors)) {
     $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date, is_draft) VALUES (?, ?, ?, ?, NOW(), ?)");
     $stmt->bind_param("ssssi", $title, $topic, $content, $userId, $isDraft);
 
-        // execute the statement
         if ($stmt->execute()) {
             // success
             if ($isDraft) {
@@ -76,7 +75,6 @@ if (array_filter($errors)) {
             // error
             echo 'query error: ' . $stmt->error;
         }
-        
 
         // close the statement
         $stmt->close();
