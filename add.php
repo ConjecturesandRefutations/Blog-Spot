@@ -110,8 +110,15 @@ if(isset($_POST['submit']) || isset($_POST['draft'])) {
         <!-- Add featured image -->
 
         <div class="row">
-            <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage()">
+            <!-- Custom styled button -->
+            <label for="featured_image_input" class="custom-file-upload">
+                Add Featured Image (Optional)
+            </label>
+            <!-- Actual file input hidden from view -->
+            <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage()" style="display: none;">
+            <img id="featuredImagePreview" src="#" alt="Featured Image Preview" style="display: none; max-width: 100px;">
         </div>
+
 
         <div class="input-field">
             <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
@@ -158,11 +165,11 @@ if(isset($_POST['submit']) || isset($_POST['draft'])) {
             // Handle the response
             console.log(response);
 
-            // Update the featured image on the page if upload was successful
+            // Update the featured image preview on the page if upload was successful
             let responseData = JSON.parse(response);
             if (responseData.status === 'success') {
                 // Update the featured image preview on the page
-                $('#featuredImagePreview').attr('src', responseData.featured_image);
+                $('#featuredImagePreview').attr('src', responseData.featured_image).show();
             } else {
                 // Display error message
                 console.error(responseData.message);
