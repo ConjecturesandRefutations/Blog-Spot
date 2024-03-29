@@ -17,36 +17,35 @@ if (!isset($_SESSION['user_id'])) {
 $title = $topic = $content = '';
 $errors = array('title' =>'', 'topic'=>'', 'content' => '');
 
-    if(isset($_POST['submit']) || isset($_POST['draft']))   {
+if(isset($_POST['submit']) || isset($_POST['draft'])) {
     
-//check title
-if(empty($_POST['title'])){
-    $errors['title'] = 'Blog must have a title';
-} else{
-    $title = $_POST['title'];
-}
-//check topic
-if(empty($_POST['topic'])){
-    $errors['topic'] = 'Blog must have a topic';
-} else{
-    $topic = $_POST['topic'];
-}
+    // Check title
+    if(empty($_POST['title'])){
+        $errors['title'] = 'Blog must have a title';
+    } else{
+        $title = $_POST['title'];
+    }
+    
+    // Check topic
+    if(empty($_POST['topic'])){
+        $errors['topic'] = 'Blog must have a topic';
+    } else{
+        $topic = $_POST['topic'];
+    }
 
-//check content
-if(empty($_POST['content'])){
-    $errors['content'] = 'You need to write the main content of your blog <br/>';
-} else{
-    $content = $_POST['content'];
-}
+    // Check content
+    if(empty($_POST['content'])){
+        $errors['content'] = 'You need to write the main content of your blog <br/>';
+    } else{
+        $content = $_POST['content'];
+    }
 
-if (array_filter($errors)) {
-    // echo 'errors in form';
-} else {
-    $title = $_POST['title'];
-    $content = mysqli_real_escape_string($conn, $_POST['content']);
-
-    // set $topic after the conversion
-    $topic = mysqli_real_escape_string($conn, $_POST['topic']);
+    if (array_filter($errors)) {
+        // echo 'errors in form';
+    } else {
+        $title = $_POST['title'];
+        $content = mysqli_real_escape_string($conn, $_POST['content']);
+        $topic = mysqli_real_escape_string($conn, $_POST['topic']);
 
         // Convert newlines to HTML line breaks
         $content = $_POST['content'];
@@ -56,38 +55,44 @@ if (array_filter($errors)) {
         // Replace HTML line breaks with spaces
         $content = str_replace('<br />', ' ', $content);
 
-    $userId = $_SESSION['user_id']; 
+        $userId = $_SESSION['user_id']; 
 
-    $isDraft = isset($_POST['draft']) ? 1 : 0;
+        $isDraft = isset($_POST['draft']) ? 1 : 0;
 
-    // Use prepared statement
-    $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date, is_draft) VALUES (?, ?, ?, ?, NOW(), ?)");
-    $stmt->bind_param("ssssi", $title, $topic, $content, $userId, $isDraft);
+        // Use prepared statement
+        $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date, is_draft, featured_image) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
+        $stmt->bind_param("sssiss", $title, $topic, $content, $userId, $isDraft, $_FILES['featured_image']['name']);
+
+
 
         if ($stmt->execute()) {
             // success
+            $blog_id = $stmt->insert_id; // Retrieve the inserted blog_id
             if ($isDraft) {
                 header("Location: drafts.php?id=" . $_SESSION['user_id']);
             } else {
+                // Pass the blog_id to the upload_featured_image.php script via AJAX
+                echo '<script>';
+                echo 'let blogId = ' . $blog_id . ';';
+                echo 'uploadFeaturedImage();';
+                echo '</script>';
                 header('Location: index.php');
             }
-        } else {
-            // error
-            echo 'query error: ' . $stmt->error;
         }
+        
 
         // close the statement
         $stmt->close();
     }
 }
-// end POST check
+
 ?>
 
 <?php include('templates/header.php'); ?>
 
 <section class="container grey-text xxs3 xs4 s6">
     <h4 class="center">Write a Blog</h4>
-    <form action="add.php" method="POST" class="white">
+    <form action="add.php" method="POST" class="white" enctype="multipart/form-data">
         <div class="row">
             <div class="input-field col s12 m6">
                 <label for="">Title</label>
@@ -100,6 +105,14 @@ if (array_filter($errors)) {
                 <div class="red-text"><?php echo $errors['topic'] ?></div>
             </div>
         </div>
+        <div class="row">
+
+        <!-- Add featured image -->
+
+        <div class="row">
+            <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage()">
+        </div>
+
         <div class="input-field">
             <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
@@ -126,4 +139,40 @@ if (array_filter($errors)) {
          ]
       });
    }); 
+
+   function uploadFeaturedImage(blogId) {
+    let formData = new FormData();
+    let fileInput = document.querySelector('input[type="file"]');
+    let file = fileInput.files[0];
+
+    formData.append('featured_image', file);
+    formData.append('blog_id', blogId);
+
+    $.ajax({
+        type: 'POST',
+        url: 'utilities/upload_featured_image.php',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Handle the response
+            console.log(response);
+
+            // Update the featured image on the page if upload was successful
+            let responseData = JSON.parse(response);
+            if (responseData.status === 'success') {
+                // Update the featured image preview on the page
+                $('#featuredImagePreview').attr('src', responseData.featured_image);
+            } else {
+                // Display error message
+                console.error(responseData.message);
+            }
+        },
+        error: function(error) {
+            // Handle the error
+            console.error(error);
+        }
+    });
+}
+
 </script>

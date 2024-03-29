@@ -5,28 +5,33 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Assuming $user_id is already defined in your code
-$user_id = $_POST['user_id']; // Make sure to pass the user_id via AJAX
-$blog_id = $_POST['blog_id']; // Retrieve the blog ID from the form data
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // Send an error response if the user is not logged in
+    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+    exit;
+}
 
-// Check if a profile image was uploaded
+// Assuming $user_id is already defined in your code
+$user_id = $_SESSION['user_id']; // Use the user ID from the session
+
+// Check if a featured image was uploaded
 if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
     try {
         // Use a database transaction for consistency
         $mysqli->begin_transaction();
 
-        $uploadDir = __DIR__ . '/../uploads/';
-        $uploadFile = $uploadDir . basename($_FILES['featured_image']['name']);
+        // Define the full image path
+        $fullImagePath = __DIR__ . '/../uploads/' . basename($_FILES['featured_image']['name']);
+        $relativeImagePath = 'uploads/' . basename($_FILES['featured_image']['name']);
 
         // Move the uploaded file to the specified directory
-        if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $uploadFile)) {
-
-            // Update the database with the relative image path
-            $relativeImagePath = 'uploads/' . basename($_FILES['featured_image']['name']);
-            $updateImageQuery = "UPDATE blogs SET featured_image = ? WHERE user_id = ? AND blog_id = ?";
+        if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $fullImagePath)) {
+            // Update the database with the full image path
+            $updateImageQuery = "UPDATE blogs SET featured_image = ? WHERE id = ?";
             $stmt_update_image = $mysqli->prepare($updateImageQuery);
-            $stmt_update_image->bind_param("sii", $relativeImagePath, $user_id, $blog_id);
-            
+            $stmt_update_image->bind_param("si", $fullImagePath, $_POST['blog_id']);
+
             if ($stmt_update_image->execute()) {
                 // Commit the transaction
                 $mysqli->commit();
@@ -53,6 +58,7 @@ if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === U
     // Send an error response if no file was uploaded
     echo json_encode(['status' => 'error', 'message' => 'No file uploaded']);
 }
+
 
 // Close the database connection
 mysqli_close($mysqli);
