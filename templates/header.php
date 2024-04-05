@@ -14,7 +14,7 @@ if (isset($_SESSION["user_id"])) {
 
 // Display the message only if the user is logged out
 if ($user === null) {
-    echo '<div class="row">';
+    echo '<div class="login-advice row" id="login-advice">';
     echo '<div class="col s12">';
     echo '<div class="card red lighten-3">';
     echo '<div class="card-content">';
@@ -36,18 +36,21 @@ if ($user === null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Spot</title>
     <link rel="stylesheet" href="./styles.css">
-    <link rel="shortcut icon" href="./images/favicon.png" type="image/svg+xml">
+    <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
     <!-- Materialize CSS linked below -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Font Awesome-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="./tinymce/tinymce.min.js"></script>
 </head>
 <body class="grey lighten-4">
-<nav class="white z-depth-0 fixed header">
-    <div class="container">
+<nav class="white z-depth-0 header" id="header">
+    <div class="container header-container">
     <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
     <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
     <ul id='nav-mobile' class="right">
@@ -96,10 +99,25 @@ if ($user === null) {
   <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>
 </ul>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var elems = document.querySelectorAll('.sidenav');
-      var instances = M.Sidenav.init(elems);
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var elems = document.querySelectorAll('.sidenav');
+    var instances = M.Sidenav.init(elems);
+    
+    var header = document.getElementById('header');
+    var headerHeight = header.offsetHeight; // Get the height of the header
+    var scrollYOffset = <?php echo isset($_SESSION["user_id"]) ? '0' : '94'; ?>; // Set the initial scroll offset based on user login status
+    
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > scrollYOffset) {
+            header.classList.add('sticky');
+            document.body.style.paddingTop = headerHeight + 'px'; // Add padding to the top of the body equal to the height of the header
+        } else {
+            header.classList.remove('sticky');
+            document.body.style.paddingTop = 0; // Remove the padding when the header is no longer sticky
+        }
     });
+});
 
-  </script>
+</script>
+

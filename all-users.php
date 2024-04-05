@@ -31,12 +31,6 @@ $result = mysqli_query($conn, $sql);
 // Fetch the resulting rows as an array
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-// Free result from memory
-mysqli_free_result($result);
-
-// Close connection
-mysqli_close($conn);
-
 // Function to calculate word count with HTML tags stripped
 function calculateWordCount($content) {
     // Remove HTML tags from the content
@@ -66,6 +60,7 @@ function calculateWordCount($content) {
     </div>
 </div>
 
+<!-- Add the missing container -->
 <div class="container">
     <div class="row" id="user-list">
     <?php foreach ($users as $profileUser) : ?>

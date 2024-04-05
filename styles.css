@@ -274,27 +274,13 @@ font-style: italic;
   display: none !important;
 }
 
-.sticky {
-  position: relative; 
-  z-index: 999;
-}
 
-.sticked {
-  position: fixed;
-  top: 0;
+.hidden{
+    display: none;
 }
 
 .favicon{
   display: none !important;
-}
-
-.blog-title {
-  display: -webkit-box;
-  -webkit-line-clamp: 9;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 20px;
 }
 
 #deleteAccountForm{
@@ -310,11 +296,10 @@ font-style: italic;
   }
   #burger-anchor,#burger-img{
     display: block !important;
-    position: absolute;
-    right: 30px;
-    top: 7px;
     height: 30px;
     width: 30px;
+    margin-top: 6px !important;
+    left: 90% !important;
   }
 }
 
@@ -325,6 +310,11 @@ font-style: italic;
 }
 
 @media (max-width: 500px) {
+    
+    #burger-anchor,#burger-img{
+    left: 50% !important;
+  }
+    
   .login-card {
     margin: 0;
     width: 400px;
@@ -340,21 +330,22 @@ font-style: italic;
     display: none !important;
   }
    .favicon{
-    display: block !important;
-    height: 100px;
-    width: 90%;
-    margin-left: 50%;
-    transform: translate(-50%);
-    margin-bottom: 20px;
+      max-width: 100%; 
+      max-height: 150px;
+      width: auto; 
+      height: auto; 
+      display: block !important; 
+      margin: 0 auto; 
   } 
   #category{
     display: none !important;
   }
-  .blog-card{
-    height: 300px;
-  }
+
 }
 
+.header{
+    z-index: 9999;
+}
 
 @media (max-width: 450px) {
   .login-card {
@@ -385,15 +376,8 @@ font-style: italic;
     margin: 0;
     width: 280px;
   }
-  .blog-title{
-    font-size: small;
-  }
-  .favicon{
-    height: 90px;
-    width: 100%;
-    margin-bottom: 10px;
 
-  }
+
 }
 
 @media (max-width: 328px) {
@@ -407,6 +391,9 @@ font-style: italic;
   .login-card {
     margin: 0;
     width: 250px;
+  }
+      #burger-anchor,#burger-img{
+    left: 40% !important;
   }
 }
 
@@ -519,4 +506,18 @@ font-style: italic;
 
 .custom-file-upload:hover {
   background-color: #e0e0e0;
+}
+
+.sticky{
+    top: 0;
+    position: fixed;
+    z-index: 9999;
+}
+
+.sidenav {
+    z-index: 99999 !important; 
+}
+
+.tox-promotion{
+    display:none;
 }
