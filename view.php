@@ -261,10 +261,10 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
     <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
     
-    <div class="row">
+    <div class="row featured-image" style="display:none;">
             <!-- Custom styled button -->
             <label for="featured_image_input" class="custom-file-upload">
-                Add Featured Image (Optional)
+                Edit Featured Image
             </label>
             <!-- Actual file input hidden from view -->
             <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage(<?php echo $id; ?>)" style="display: none;">
@@ -352,6 +352,15 @@ function toggleEdit() {
         editButton.innerHTML = 'Save';
         addBorder(title, content, topic);
     }
+
+    let featuredImageButton = document.querySelector('.featured-image')
+    if(featuredImageButton.style.display === "none"){
+        featuredImageButton.style.display = "block";
+    } else if(featuredImageButton.style.display === "block"){
+        featuredImageButton.style.display = "none";
+    }
+
+
 }
 
 function decodeEntities(encodedString) {
