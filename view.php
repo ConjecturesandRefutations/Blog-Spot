@@ -261,15 +261,19 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
     <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
     
-    <div class="row">
+    <div class="row featured-image" style="display:none;">
             <!-- Custom styled button -->
             <label for="featured_image_input" class="custom-file-upload">
-                Add Featured Image (Optional)
+                Edit Featured Image
             </label>
             <!-- Actual file input hidden from view -->
             <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage(<?php echo $id; ?>)" style="display: none;">
-            <img id="featuredImagePreviewTwo" src="#" alt="Featured Image Preview" style="display: none; max-width: 100px;">
     </div>
+
+    <?php if (!empty($blog['featured_image'])): ?>
+                        <!-- Display the featured image -->
+                        <img class="faviconTwo" src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
+    <?php endif; ?>
     
     <hr>
     <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
@@ -352,6 +356,15 @@ function toggleEdit() {
         editButton.innerHTML = 'Save';
         addBorder(title, content, topic);
     }
+
+    let featuredImageButton = document.querySelector('.featured-image')
+    if(featuredImageButton.style.display === "none"){
+        featuredImageButton.style.display = "block";
+    } else if(featuredImageButton.style.display === "block"){
+        featuredImageButton.style.display = "none";
+    }
+
+
 }
 
 function decodeEntities(encodedString) {
@@ -514,8 +527,9 @@ function uploadFeaturedImage(blogId) {
             // Update the featured image preview on the page if upload was successful
             let responseData = JSON.parse(response);
             if (responseData.status === 'success') {
-                // Update the featured image preview on the page
-                $('#featuredImagePreviewTwo').attr('src', responseData.featured_image).show();
+                // Update the featured image src attribute with the new image URL
+                let newImageUrl = responseData.featured_image;
+                $('.faviconTwo').attr('src', newImageUrl);
             } else {
                 // Display error message
                 console.error(responseData.message);
@@ -527,6 +541,7 @@ function uploadFeaturedImage(blogId) {
         }
     });
 }
+
 
 
 </script>
