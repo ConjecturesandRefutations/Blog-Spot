@@ -12,32 +12,28 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Assuming $user_id is already defined in your code
-$user_id = $_SESSION['user_id']; // Use the user ID from the session
-
 // Check if a featured image was uploaded
 if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
     try {
         // Use a database transaction for consistency
         $mysqli->begin_transaction();
 
-        // Define the full image path
-        $fullImagePath = __DIR__ . '/../uploads/' . basename($_FILES['featured_image']['name']);
-        $relativeImagePath = 'uploads/' . basename($_FILES['featured_image']['name']);
+        // Define the filename for the image
+        $imageFilename = basename($_FILES['featured_image']['name']);
 
         // Move the uploaded file to the specified directory
-        if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $fullImagePath)) {
-            // Update the database with the full image path
+        if (move_uploaded_file($_FILES['featured_image']['tmp_name'], __DIR__ . '/../uploads/' . $imageFilename)) {
+            // Update the database with the image filename
             $updateImageQuery = "UPDATE blogs SET featured_image = ? WHERE id = ?";
             $stmt_update_image = $mysqli->prepare($updateImageQuery);
-            $stmt_update_image->bind_param("si", $fullImagePath, $_POST['blog_id']);
+            $stmt_update_image->bind_param("si", $imageFilename, $_POST['blog_id']);
 
             if ($stmt_update_image->execute()) {
                 // Commit the transaction
                 $mysqli->commit();
 
                 // Send a success response
-                echo json_encode(['status' => 'success', 'message' => 'Featured image uploaded successfully', 'featured_image' => $relativeImagePath]);
+                echo json_encode(['status' => 'success', 'message' => 'Featured image uploaded successfully', 'featured_image' => 'uploads/' . $imageFilename]);
             } else {
                 // Rollback the transaction in case of a database error
                 $mysqli->rollback();
@@ -59,7 +55,6 @@ if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === U
     echo json_encode(['status' => 'error', 'message' => 'No file uploaded']);
 }
 
-
 // Close the database connection
-mysqli_close($mysqli);
+$mysqli->close();
 ?>

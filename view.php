@@ -138,6 +138,61 @@ if (isset($_POST['submit_feedback'])) {
     }
 }
 
+// Handle Image Upload
+if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
+    $file = $_FILES['featured_image'];
+
+    // File properties
+    $file_name = $file['name'];
+    $file_tmp = $file['tmp_name'];
+    $file_size = $file['size'];
+    $file_error = $file['error'];
+
+    // File extension
+    $file_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+    $file_ext = strtolower($file_ext);
+
+    // Allowed extensions
+    $allowed = array('jpg', 'jpeg', 'png', 'webp', 'gif');
+
+    if (in_array($file_ext, $allowed)) {
+        if ($file_error === 0) {
+            if ($file_size <= 2097152) { // 2MB limit
+                // Generate unique filename
+                $file_new_name = uniqid('', true) . '.' . $file_ext;
+
+                // Define file destination
+                $file_destination = 'uploads/' . $file_new_name;
+
+                if (move_uploaded_file($file_tmp, $file_destination)) {
+                    // File uploaded successfully
+                    // Save only the image name to the database, not the full path
+                    $image_name = $file_new_name;
+                    $sql = "UPDATE blogs SET featured_image = '$image_name' WHERE id = $id";
+                    // Execute SQL query
+                    mysqli_query($conn, $sql);
+
+                    // Redirect or display success message
+                    header('Location: view.php?id=' . $id);
+                    exit();
+                } else {
+                    // Error uploading file
+                    echo 'Error uploading file.';
+                }
+            } else {
+                // File too large
+                echo 'File size exceeds limit.';
+            }
+        } else {
+            // Error uploading file
+            echo 'Error uploading file.';
+        }
+    } else {
+        // Invalid file type
+        echo 'Invalid file type.';
+    }
+}
+
 ?>
 
 <?php include('templates/header.php'); ?>
@@ -205,6 +260,17 @@ if (isset($_POST['submit_feedback'])) {
     <p class='center'>Topic: <span id="editableTopic" contenteditable="false" style="font-style:italic"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
     <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
     <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
+    
+    <div class="row">
+            <!-- Custom styled button -->
+            <label for="featured_image_input" class="custom-file-upload">
+                Add Featured Image (Optional)
+            </label>
+            <!-- Actual file input hidden from view -->
+            <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage(<?php echo $id; ?>)" style="display: none;">
+            <img id="featuredImagePreviewTwo" src="#" alt="Featured Image Preview" style="display: none; max-width: 100px;">
+    </div>
+    
     <hr>
     <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
    
@@ -426,5 +492,41 @@ document.addEventListener('DOMContentLoaded', function () {
 function confirmDelete() {
     return confirm("Are you sure you want to delete this blog?");
 }
+
+function uploadFeaturedImage(blogId) {
+    let formData = new FormData();
+    let fileInput = document.querySelector('input[type="file"]');
+    let file = fileInput.files[0];
+
+    formData.append('featured_image', file);
+    formData.append('blog_id', blogId);
+
+    $.ajax({
+        type: 'POST',
+        url: 'utilities/upload_featured_image.php',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Handle the response
+            console.log(response);
+
+            // Update the featured image preview on the page if upload was successful
+            let responseData = JSON.parse(response);
+            if (responseData.status === 'success') {
+                // Update the featured image preview on the page
+                $('#featuredImagePreviewTwo').attr('src', responseData.featured_image).show();
+            } else {
+                // Display error message
+                console.error(responseData.message);
+            }
+        },
+        error: function(error) {
+            // Handle the error
+            console.error(error);
+        }
+    });
+}
+
 
 </script>
