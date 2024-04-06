@@ -260,11 +260,10 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     <p class='center'>Topic: <span id="editableTopic" contenteditable="false" style="font-style:italic"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
     <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
     <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
-    
     <div class="row featured-image" style="display:none;">
             <!-- Custom styled button -->
             <label for="featured_image_input" class="custom-file-upload">
-                Edit Featured Image
+            <?php echo ($blog['featured_image'] !== '') ? 'Edit Featured Image' : 'Add Featured Image'; ?>
             </label>
             <!-- Actual file input hidden from view -->
             <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage(<?php echo $id; ?>)" style="display: none;">
@@ -392,6 +391,7 @@ function submitForm() {
     const editedContentInput = document.getElementById('editedContent');
     const editedTopicInput = document.getElementById('editedTopic');
     const contentEditor = tinymce.get('editableContent');
+    const previousFeaturedImage = $('.faviconTwo').attr('src'); // Store the current image URL
 
     // Set the values in the hidden input fields
     editedTitleInput.value = document.getElementById('editableTitle').innerText;
@@ -412,12 +412,23 @@ function submitForm() {
         })
         .then(responseText => {
             console.log('Response Text:', responseText);
+            // Check if the featured image has been updated
+            const currentFeaturedImage = $('.faviconTwo').attr('src');
+            if (currentFeaturedImage !== previousFeaturedImage) {
+                // If the featured image has been updated, nothing needs to be done as it's already displayed
+                console.log('Featured image updated successfully.');
+            } else {
+                // If the featured image hasn't been updated, reapply the previous image URL
+                $('.faviconTwo').attr('src', previousFeaturedImage);
+                console.log('Featured image retained.');
+            }
         })
         .catch(error => {
             console.error('Error in fetch request:', error);
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
 }
+
 
 function initializeTinyMCE(editMode) {
     if (editMode) {
@@ -521,20 +532,29 @@ function uploadFeaturedImage(blogId) {
         processData: false,
         contentType: false,
         success: function(response) {
-            // Handle the response
-            console.log(response);
+    // Handle the response
+    console.log(response);
 
-            // Update the featured image preview on the page if upload was successful
-            let responseData = JSON.parse(response);
-            if (responseData.status === 'success') {
-                // Update the featured image src attribute with the new image URL
-                let newImageUrl = responseData.featured_image;
-                $('.faviconTwo').attr('src', newImageUrl);
-            } else {
-                // Display error message
-                console.error(responseData.message);
-            }
-        },
+    // Update the featured image preview on the page if upload was successful
+    let responseData = JSON.parse(response);
+    if (responseData.status === 'success') {
+        // Check if the image tag exists
+        let featuredImage = $('.faviconTwo');
+        if (featuredImage.length === 0) {
+            // Create a new image tag if it doesn't exist
+            featuredImage = $('<img>').addClass('faviconTwo');
+            $('.featured-image').append(featuredImage);
+        }
+
+        // Update the featured image src attribute with the new image URL
+        let newImageUrl = responseData.featured_image;
+        featuredImage.attr('src', newImageUrl);
+        featuredImage.show(); // Make sure the image is visible
+    } else {
+        // Display error message
+        console.error(responseData.message);
+    }
+},
         error: function(error) {
             // Handle the error
             console.error(error);
