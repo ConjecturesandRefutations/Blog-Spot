@@ -422,13 +422,15 @@ function submitForm() {
                 $('.faviconTwo').attr('src', previousFeaturedImage);
                 console.log('Featured image retained.');
             }
+
+            // Reload the page after successful submission
+            location.reload();
         })
         .catch(error => {
             console.error('Error in fetch request:', error);
             alert('An error occurred during form submission. Please try again.\n\n' + error);
         });
 }
-
 
 function initializeTinyMCE(editMode) {
     if (editMode) {
