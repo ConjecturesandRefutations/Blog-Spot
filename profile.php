@@ -203,7 +203,8 @@
 
     <div class="container center" id="blogList">
         <div class="row">
-        <h5 class='center grey-text'>                     <?php
+        <h5 class='center grey-text'>                     
+            <?php
                     if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
                         echo "Your Blogs";
                     } else {

@@ -22,6 +22,7 @@ $sql = "SELECT DISTINCT blogs.title, blogs.content, blogs.date, blogs.id, blogs.
             OR user.name LIKE '%$search%'
             OR blogs.topic LIKE '%$search%')
             AND blogs.is_draft = 0  -- Include only published blogs
+            AND blogs.id NOT IN (1, 2) 
          GROUP BY blogs.id
          ORDER BY last_updated DESC, blogs.id DESC";
 

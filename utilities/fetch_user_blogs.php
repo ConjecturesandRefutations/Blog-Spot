@@ -69,4 +69,3 @@ if (isset($_GET["id"])) {
 // Close connection
 mysqli_close($mysqli);
 ?>
-
