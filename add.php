@@ -119,7 +119,6 @@ if(isset($_POST['submit']) || isset($_POST['draft'])) {
             <img id="featuredImagePreview" src="#" alt="Featured Image Preview" style="display: none; max-width: 100px;">
         </div>
 
-
         <div class="input-field">
             <textarea id="content" name="content" class="materialize-textarea auto-resize" placeholder="Content"><?php echo htmlspecialchars($content) ?></textarea>
             <div class="red-text"><?php echo $errors['content'] ?></div>
