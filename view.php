@@ -316,7 +316,7 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     <div id="imageModal" class="modal">
         <div class="modal-content center">
             <!-- Display the featured image inside the modal -->
-            <img src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
+            <img class="modal-image" src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>

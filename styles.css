@@ -568,3 +568,25 @@ font-style: italic;
 .tox-promotion{
     display:none;
 }
+
+.modal-image{
+  max-width: 500px;
+}
+
+@media(max-width: 500px){
+  .modal-image{
+    max-width: 400px;
+  }
+}
+
+@media(max-width: 400px){
+  .modal-image{
+    max-width: 300px;
+  }
+}
+
+@media(max-width: 300px){
+  .modal-image{
+    max-width: 200px;
+  }
+}
