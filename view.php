@@ -70,6 +70,23 @@ if (isset($_POST['draft'])) {
     }
 }
 
+// Handle Featured Image Deletion
+if (isset($_POST['delete_featured_image'])) {
+    $id_to_delete_featured_image = mysqli_real_escape_string($conn, $_POST['id_to_delete_featured_image']);
+
+    // Update the 'featured_image' property to empty string
+    $deleteImageSql = "UPDATE blogs SET featured_image = '' WHERE id = $id_to_delete_featured_image";
+
+    if (mysqli_query($conn, $deleteImageSql)) {
+        header('Location: view.php?id=' . $id_to_delete_featured_image);
+        exit();
+    } else {
+        // Failure
+        echo 'query error: ' . mysqli_error($conn);
+    }
+}
+
+
 // Check GET request id parameter
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -260,19 +277,53 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     <p class='center'>Topic: <span id="editableTopic" contenteditable="false" style="font-style:italic"><?php echo htmlspecialchars($blog['topic']); ?></span></p>
     <p class='center' contenteditable="false">Created On: <span style='font-style: italic;'><?php echo date('d M Y', strtotime($blog['date'])); ?></span></p>
     <p class='center' contenteditable="false">Last Updated: <span style='font-style: italic;'><?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></span></p>
-    <div class="row featured-image" style="display:none;">
+    
+<div class="row featured-image" style="display:none;">
+    <div class="flex-featured">
+        <!-- First column for the first button -->
+        <div class="featured-item">
             <!-- Custom styled button -->
             <label for="featured_image_input" class="custom-file-upload">
-            <?php echo ($blog['featured_image'] !== '') ? 'Edit Featured Image' : 'Add Featured Image'; ?>
+                <?php echo ($blog['featured_image'] !== '') ? 'Change Featured Image' : 'Add Featured Image'; ?>
             </label>
             <!-- Actual file input hidden from view -->
             <input type="file" name="featured_image" id="featured_image_input" accept="image/*" onchange="uploadFeaturedImage(<?php echo $id; ?>)" style="display: none;">
+        </div>
+
+        <!-- Second column for the second button (if featured image exists) -->
+        <?php if (!empty($blog['featured_image'])): ?>
+            <div class="featured-item">
+                <!-- Display the 'Delete Featured Image' button -->
+                <form action="view.php" method="POST">
+                    <input type="hidden" name="id_to_delete_featured_image" value="<?php echo $blog['id']; ?>">
+                    <button type="submit" name="delete_featured_image" class="custom-file-upload delete_featured_image">Remove Featured Image</button>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<?php if (!empty($blog['featured_image'])): ?>
+    <!-- Display the featured image with a link to open the modal -->
+    <div class="center">
+        <a class="waves-effect waves-light modal-trigger" href="#imageModal">
+            <img class="faviconTwo" src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
+        </a>
     </div>
 
-    <?php if (!empty($blog['featured_image'])): ?>
-                        <!-- Display the featured image -->
-                        <img class="faviconTwo" src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
-    <?php endif; ?>
+    <!-- Modal Structure -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content center">
+            <!-- Display the featured image inside the modal -->
+            <img src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
+<?php endif; ?>
+
     
     <hr>
     <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
@@ -314,6 +365,29 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
 <?php include('templates/footer.php'); ?>
 
 <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM content loaded"); // Debug statement
+
+    var elems = document.querySelectorAll('.modal');
+    console.log("Modal elements found:", elems.length); // Debug statement
+    var instances = M.Modal.init(elems);
+
+    // Prevent default behavior of anchor links with class 'modal-trigger'
+    var modalTriggers = document.querySelectorAll('.modal-trigger');
+    console.log("Modal triggers found:", modalTriggers.length); // Debug statement
+    modalTriggers.forEach(function(trigger) {
+        trigger.addEventListener('click', function(event) {
+            console.log("Modal trigger clicked"); // Debug statement
+            event.preventDefault(); // Prevent default anchor behavior
+
+            // Optionally, open the modal manually
+            var modalId = trigger.getAttribute('href').substring(1); // Get the modal ID
+            var modalInstance = M.Modal.getInstance(document.getElementById(modalId));
+            modalInstance.open();
+        });
+    });
+});
 
 function toggleEdit() {
     const title = document.getElementById('editableTitle');
@@ -362,7 +436,6 @@ function toggleEdit() {
     } else if(featuredImageButton.style.display === "block"){
         featuredImageButton.style.display = "none";
     }
-
 
 }
 
