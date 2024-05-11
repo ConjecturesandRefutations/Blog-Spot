@@ -569,7 +569,7 @@ font-style: italic;
     display:none;
 }
 
-.modal-image{
+.modal-image,.profile-image{
   max-width: 500px;
 }
 

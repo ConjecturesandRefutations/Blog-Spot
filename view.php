@@ -637,6 +637,4 @@ function uploadFeaturedImage(blogId) {
     });
 }
 
-
-
 </script>

@@ -156,7 +156,23 @@
         </div>
 
         <div class="image">
-        <img id="profileImagePreview" src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+        <?php if (!empty($profileUser['profile_image'])): ?>
+            <a href="#profileImageModal" class="modal-trigger">
+                <img id="profileImagePreview" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+            </a>
+            <!-- Modal Structure -->
+            <div id="profileImageModal" class="modal">
+            <div class="modal-footer">
+                  <a href="#!" class="modal-close red btn-flat">Close</a>
+                </div>
+                <div class="modal-content">
+                    <img class="profile-image" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image">
+                </div>
+
+            </div>
+        <?php else: ?>
+            <img id="profileImagePreview" src="images/defaultProfile.jpg" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+        <?php endif; ?>
 
         <!-- Form for profile image upload -->
         <form class="" action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
