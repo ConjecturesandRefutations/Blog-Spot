@@ -307,7 +307,7 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
 <?php if (!empty($blog['featured_image'])): ?>
     <!-- Display the featured image with a link to open the modal -->
     <div class="center">
-        <a class="waves-effect waves-light modal-trigger" href="#imageModal">
+        <a class="modal-trigger" href="#imageModal">
             <img class="faviconTwo" src="uploads/<?php echo htmlspecialchars($blog['featured_image']); ?>" alt="Featured Image">
         </a>
     </div>
@@ -636,5 +636,7 @@ function uploadFeaturedImage(blogId) {
         }
     });
 }
+
+
 
 </script>
