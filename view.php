@@ -369,12 +369,12 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded"); // Debug statement
 
-    var elems = document.querySelectorAll('.modal');
+    let elems = document.querySelectorAll('.modal');
     console.log("Modal elements found:", elems.length); // Debug statement
-    var instances = M.Modal.init(elems);
+    let instances = M.Modal.init(elems);
 
     // Prevent default behavior of anchor links with class 'modal-trigger'
-    var modalTriggers = document.querySelectorAll('.modal-trigger');
+    let modalTriggers = document.querySelectorAll('.modal-trigger');
     console.log("Modal triggers found:", modalTriggers.length); // Debug statement
     modalTriggers.forEach(function(trigger) {
         trigger.addEventListener('click', function(event) {
@@ -382,8 +382,8 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault(); // Prevent default anchor behavior
 
             // Optionally, open the modal manually
-            var modalId = trigger.getAttribute('href').substring(1); // Get the modal ID
-            var modalInstance = M.Modal.getInstance(document.getElementById(modalId));
+            let modalId = trigger.getAttribute('href').substring(1); // Get the modal ID
+            let modalInstance = M.Modal.getInstance(document.getElementById(modalId));
             modalInstance.open();
         });
     });

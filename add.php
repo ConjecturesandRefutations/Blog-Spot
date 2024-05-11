@@ -128,7 +128,7 @@ if(isset($_POST['submit']) || isset($_POST['draft'])) {
             <input type="submit" name='submit' value="Publish" class="btn green z-depth-0">
     </form>
 </section>
-
+s
 <?php include('templates/footer.php'); ?>
 
     <script>
