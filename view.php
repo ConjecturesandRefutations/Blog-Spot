@@ -13,13 +13,29 @@ if (session_status() == PHP_SESSION_NONE) {
 if (isset($_POST['delete'])) {
     $id_to_delete = mysqli_real_escape_string($conn, $_POST['id_to_delete']);
 
+    // Retrieve the 'is_draft' status of the blog
+    $draftSql = "SELECT is_draft FROM blogs WHERE id = $id_to_delete";
+    $draftResult = mysqli_query($conn, $draftSql);
+    $blog = mysqli_fetch_assoc($draftResult);
+    $isDraft = $blog['is_draft'];
+
+    if ($isDraft == 0) {
+        // If the deleted blog is not a draft, redirect to index.php
+        $redirectLocation = 'index.php';
+    } else {
+        // If the deleted blog is a draft, redirect to drafts.php
+        $redirectLocation = 'drafts.php?id=' . $_SESSION['user_id'];
+    }
+
+    // Proceed with deletion
     $sql = "DELETE FROM blogs WHERE id = $id_to_delete";
 
     if (mysqli_query($conn, $sql)) {
-        //success
-        header('Location: index.php');
+        // Success
+        header("Location: $redirectLocation");
+        exit(); // Ensure script execution stops after redirection
     } else {
-        //failure
+        // Failure
         echo 'query error: ' . mysqli_error($conn);
     }
 }
