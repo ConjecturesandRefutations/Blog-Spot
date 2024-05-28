@@ -283,7 +283,13 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
         <input type="hidden" name="blog_id" value="<?php echo $blog['id']; ?>">
         <textarea id="feedbackTextarea" name="feedback_text" placeholder="Add your feedback..." required style="display: none;"></textarea>
         <button type="submit" name="submit_feedback" id="feedbackButton" class="btn blue lighten-3 z-depth-0">Add Feedback</button>
+
+        <div class="thumbs">
+            <i class="material-icons thumb_up red-text text-lighten-3">thumb_up</i><span id="like_count"><?php echo $blog['likes']; ?></span>
+            <i class="material-icons thumb_down red-text text-lighten-3">thumb_down</i><span id="dislike_count"><?php echo $blog['dislikes']; ?></span>
+        </div>
     </form>
+
 <?php endif; ?>
 
     <h4 id="editableTitle" class='center' contenteditable="false"><?php echo htmlspecialchars($blog['title']); ?></h4>
@@ -318,7 +324,6 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
         <?php endif; ?>
     </div>
 </div>
-
 
 <?php if (!empty($blog['featured_image'])): ?>
     <!-- Display the featured image with a link to open the modal -->
@@ -382,6 +387,10 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
 
 <script>
 
+$(document).ready(function() {
+    console.log("jQuery is loaded and ready!");
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM content loaded"); // Debug statement
 
@@ -403,6 +412,41 @@ document.addEventListener('DOMContentLoaded', function() {
             modalInstance.open();
         });
     });
+});
+
+$(document).ready(function() {
+
+$('.material-icons').click(function() {
+    console.log("Icon clicked");
+
+    var blogId = <?php echo $blog['id']; ?>;
+    var action = $(this).hasClass('thumb_up') ? 'like' : 'dislike';
+    var countSpanId = action === 'like' ? '#like_count' : '#dislike_count';
+    
+    console.log("Blog ID: " + blogId);
+    console.log("Action: " + action);
+
+    $.ajax({
+        url: 'utilities/update_likes.php',
+        type: 'POST',
+        data: { id: blogId, action: action },
+        success: function(response) {
+            console.log("Server response: " + response);
+            var jsonResponse = JSON.parse(response);
+            if (jsonResponse.status === 'success') {
+                // Update the UI to reflect the new like/dislike count
+                $('#like_count').text(jsonResponse.likes);
+                $('#dislike_count').text(jsonResponse.dislikes);
+                alert('Thanks for your feedback!');
+            } else {
+                alert('Error updating likes/dislikes: ' + jsonResponse.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error: ' + status + ' ' + error);
+        }
+    });
+});
 });
 
 function toggleEdit() {
@@ -652,7 +696,5 @@ function uploadFeaturedImage(blogId) {
         }
     });
 }
-
-
 
 </script>
