@@ -573,6 +573,14 @@ font-style: italic;
   max-width: 500px;
 }
 
+.material-icons{
+  cursor: pointer;
+}
+
+.thumb_down{
+  margin-left: 30px;
+}
+
 @media(max-width: 500px){
   .modal-image{
     max-width: 400px;

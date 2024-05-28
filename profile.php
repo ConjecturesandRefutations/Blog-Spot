@@ -92,7 +92,6 @@
         return $wordCount;
     }
     
-
     // Close connection
     mysqli_close($mysqli);
     ?>
