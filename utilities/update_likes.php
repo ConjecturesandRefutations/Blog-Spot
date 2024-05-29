@@ -1,5 +1,5 @@
 <?php
-include('../config/db_connect.php');  // Adjust the path if necessary
+include('../config/db_connect.php');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -13,6 +13,9 @@ if (isset($_POST['id']) && isset($_POST['action'])) {
     $id = mysqli_real_escape_string($conn, $_POST['id']);
     $action = mysqli_real_escape_string($conn, $_POST['action']);
     $userId = $_SESSION['user_id']; // Assuming you have stored user_id in session
+
+    // Temporarily disable the trigger
+    mysqli_query($conn, "SET @DISABLE_TIMESTAMP = 1");
 
     // Check if user has already interacted with the blog
     $checkSql = "SELECT * FROM likes WHERE user_id = $userId AND blog_id = $id";
@@ -78,6 +81,15 @@ if (isset($_POST['id']) && isset($_POST['action'])) {
         } else {
             $response['error'] = mysqli_error($conn);
         }
+    }
+
+    // Re-enable the trigger
+    mysqli_query($conn, "SET @DISABLE_TIMESTAMP = 0");
+
+    // Update last_updated only if necessary (i.e., action is not like or dislike)
+    if ($action !== 'like' && $action !== 'dislike') {
+        $updateLastUpdatedSql = "UPDATE blogs SET last_updated = CURRENT_TIMESTAMP WHERE id = $id";
+        mysqli_query($conn, $updateLastUpdatedSql);
     }
 
     mysqli_close($conn);
