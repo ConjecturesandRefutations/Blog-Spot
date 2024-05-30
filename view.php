@@ -104,8 +104,31 @@ if (isset($_POST['delete_featured_image'])) {
 
 
 // Check GET request id parameter
+// Check GET request id parameter
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($conn, $_GET['id']);
+
+    // Define user interaction variables
+    $userLiked = false;
+    $userDisliked = false;
+
+    // Check if the user is logged in
+    if (isset($_SESSION['user_id'])) {
+        $userId = $_SESSION['user_id'];
+
+        // Check if the user has liked or disliked the blog post
+        $checkSql = "SELECT feedback_type FROM likes WHERE user_id = $userId AND blog_id = $id";
+        $checkResult = mysqli_query($conn, $checkSql);
+        
+        if (mysqli_num_rows($checkResult) > 0) {
+            $feedbackType = mysqli_fetch_assoc($checkResult)['feedback_type'];
+            if ($feedbackType == 'like') {
+                $userLiked = true;
+            } elseif ($feedbackType == 'dislike') {
+                $userDisliked = true;
+            }
+        }
+    }
 
     // Make sql with JOIN to get user information
     $sql = "SELECT blogs.*, user.name as author_name,
@@ -284,13 +307,33 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
         <textarea id="feedbackTextarea" name="feedback_text" placeholder="Add your feedback..." required style="display: none;"></textarea>
         <button type="submit" name="submit_feedback" id="feedbackButton" class="btn blue lighten-3 z-depth-0">Add Feedback</button>
 
-        <div class="thumbs">
-            <i class="material-icons thumb_up red-text text-lighten-3">thumb_up</i><span id="like_count"><?php echo $blog['likes']; ?></span>
-            <i class="material-icons thumb_down red-text text-lighten-3">thumb_down</i><span id="dislike_count"><?php echo $blog['dislikes']; ?></span>
-        </div>
-    </form>
-
 <?php endif; ?>
+        <div class="thumbs">
+            <?php
+            // Check if the user has liked the blog
+            if ($userLiked) {
+                // If the user has liked the blog, color the thumbs-up icon black
+                echo '<i class="material-icons thumb_up black-text">thumb_up</i>';
+            } else {
+                // If the user has not liked the blog, keep the thumbs-up icon blue
+                echo '<i class="material-icons thumb_up baby-blue">thumb_up</i>';
+            }
+            ?>
+            <span id="like_count"><?php echo $blog['likes']; ?></span>
+            <?php
+            // Check if the user has disliked the blog
+            if ($userDisliked) {
+                // If the user has disliked the blog, color the thumbs-down icon black
+                echo '<i class="material-icons thumb_down black-text">thumb_down</i>';
+            } else {
+                // If the user has not disliked the blog, keep the thumbs-down icon blue
+                echo '<i class="material-icons thumb_down baby-blue">thumb_down</i>';
+            }
+    ?>
+            <span id="dislike_count"><?php echo $blog['dislikes']; ?></span>
+</div>
+
+    </form>
 
     <h4 id="editableTitle" class='center' contenteditable="false"><?php echo htmlspecialchars($blog['title']); ?></h4>
     <hr>
@@ -415,38 +458,54 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 $(document).ready(function() {
+    $('.material-icons').click(function() {
+        let blogId = <?php echo $blog['id']; ?>;
+        let action = $(this).hasClass('thumb_up') ? 'like' : 'dislike';
 
-$('.material-icons').click(function() {
-    console.log("Icon clicked");
+        console.log("Blog ID: " + blogId);
+        console.log("Action: " + action);
 
-    var blogId = <?php echo $blog['id']; ?>;
-    var action = $(this).hasClass('thumb_up') ? 'like' : 'dislike';
-    var countSpanId = action === 'like' ? '#like_count' : '#dislike_count';
-    
-    console.log("Blog ID: " + blogId);
-    console.log("Action: " + action);
+        let iconElement = $(this);
 
-    $.ajax({
-        url: 'utilities/update_likes.php',
-        type: 'POST',
-        data: { id: blogId, action: action },
-        success: function(response) {
-            console.log("Server response: " + response);
-            var jsonResponse = JSON.parse(response);
-            if (jsonResponse.status === 'success') {
-                // Update the UI to reflect the new like/dislike count
-                $('#like_count').text(jsonResponse.likes);
-                $('#dislike_count').text(jsonResponse.dislikes);
-                alert('Thanks for your feedback!');
-            } else {
-                alert('Error updating likes/dislikes: ' + jsonResponse.error);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error: ' + status + ' ' + error);
-        }
+        // Check if user is logged in
+        <?php if(isset($_SESSION['user_id'])) { ?>
+            $.ajax({
+                url: 'utilities/update_likes.php',
+                type: 'POST',
+                data: { id: blogId, action: action },
+                success: function(response) {
+                    console.log("Server response: " + response);
+                    let jsonResponse = JSON.parse(response);
+                    if (jsonResponse.status === 'success') {
+                        // Update the UI to reflect the new like/dislike count
+                        $('#like_count').text(jsonResponse.likes);
+                        $('#dislike_count').text(jsonResponse.dislikes);
+
+                        // Determine the opposite action and select the opposite icon
+                        let oppositeAction = action === 'like' ? 'dislike' : 'like';
+                        let oppositeIcon = $('.material-icons.' + (oppositeAction === 'like' ? 'thumb_up' : 'thumb_down'));
+
+                        // Toggle the color of the clicked icon
+                        if (iconElement.hasClass('black-text')) {
+                            iconElement.removeClass('black-text').addClass('baby-blue');
+                        } else {
+                            iconElement.removeClass('baby-blue').addClass('black-text');
+                            // Ensure the opposite icon is blue when the clicked icon is changed to black
+                            oppositeIcon.removeClass('black-text').addClass('baby-blue');
+                        }
+                    } else {
+                        alert('Error updating likes/dislikes: ' + jsonResponse.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error: ' + status + ' ' + error);
+                }
+            });
+        <?php } else { ?>
+            // Alert user to login
+            alert('You must login to like or dislike a blog');
+        <?php } ?>
     });
-});
 });
 
 function toggleEdit() {

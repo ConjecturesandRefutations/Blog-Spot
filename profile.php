@@ -92,6 +92,7 @@
         return $wordCount;
     }
     
+
     // Close connection
     mysqli_close($mysqli);
     ?>
@@ -395,7 +396,7 @@ $(document).ready(function () {
             let timestamp = message.timestamp;
             let messageID = message.message_id
 
-            // Format the timestamp (you might need to adjust this based on your timestamp format)
+            // Format the timestamp 
             let formattedTimestamp = new Date(timestamp).toLocaleString();
 
             // Placeholder for the sender's name
@@ -427,7 +428,7 @@ $(document).ready(function () {
         // Make an AJAX request to fetch user details
         $.ajax({
             type: 'GET',
-            url: 'utilities/fetch_user_details.php', // Adjust the URL to your PHP script
+            url: 'utilities/fetch_user_details.php', 
             data: { user_id: userId },
             dataType: 'json',
             success: function (response) {
@@ -526,7 +527,7 @@ $(document).ready(function () {
     updateUnreadMessagesCount();
 
     // Set up an interval to regularly update the unread messages count
-    setInterval(updateUnreadMessagesCount, 30000); // Update every 30 seconds (adjust as needed)
+    setInterval(updateUnreadMessagesCount, 30000); // Update every 30 seconds
 });
 
 $(document).ready(function() {
