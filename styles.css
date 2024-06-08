@@ -517,7 +517,6 @@ font-style: italic;
 }
 
 @media(min-width: 404px){
-    
     .featured-image{
         max-width: 500px;
     }
@@ -577,6 +576,7 @@ font-style: italic;
 
 .modal-image,.profile-image{
   max-width: 500px;
+  min-width: 500px;
 }
 
 .material-icons{

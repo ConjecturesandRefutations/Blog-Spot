@@ -18,6 +18,9 @@ if (isset($_SESSION['error'])) {
     // Clear the error message from the session
     unset($_SESSION['error']);
 }
+
+require_once realpath(__DIR__ . '/../config/base_path.php');
+
 ?>
 
 
@@ -26,9 +29,9 @@ if (isset($_SESSION['error'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
+    <title>Blog Spot | Signup</title>
+    require_once realpath(__DIR__ . '/../config/base_path.php');
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>styles.css">
     <script src="../js/login.js"></script>
 </head>
 <body>

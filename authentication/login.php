@@ -44,6 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $is_invalid = true;
 }
 
+require_once realpath(__DIR__ . '/../config/base_path.php');
+
 ?>
 
 
@@ -52,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="../styles.css">
+    <title>Blog Spot | Login</title>
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>styles.css">
     <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
 </head>
 <body>
