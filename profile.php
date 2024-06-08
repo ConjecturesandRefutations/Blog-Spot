@@ -178,7 +178,7 @@
         <form class="" action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
             <!-- Add input field for profile image upload -->
             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-                <div class="file-field input-field">
+                <div class="file-field input-field change-profile-image">
                     <div class="change-image">
                         <span>Change Profile Image</span>
                         <input type="file" name="profile_image" id="profile_image_input" accept="image/*" onchange="uploadProfileImage()">

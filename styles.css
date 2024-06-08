@@ -579,6 +579,10 @@ font-style: italic;
   min-width: 500px;
 }
 
+.change-profile-image{
+  height: 0;
+}
+
 .material-icons{
   cursor: pointer;
 }
