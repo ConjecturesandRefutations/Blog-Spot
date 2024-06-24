@@ -1,11 +1,6 @@
 <?php
 include('config/db_connect.php');
 
-if (session_status() == PHP_SESSION_NONE) {
-    // Start the session only if it's not already started
-    session_start();
-}
-
 // Initialize the search variable
 $search = '';
 
