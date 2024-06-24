@@ -1,6 +1,11 @@
 <?php
 include('config/db_connect.php');
 
+if (session_status() == PHP_SESSION_NONE) {
+    // Start the session only if it's not already started
+    session_start();
+}
+
 // Initialize the search variable
 $search = '';
 
@@ -64,7 +69,7 @@ function calculateWordCount($content) {
 <div class="container">
     <div class="row" id="user-list">
     <?php foreach ($users as $profileUser) : ?>
-    <div class="col s12 user" style="border: 1px solid grey;">
+      <div class="col s12 user" style="border: 1px solid grey; <?php if (isset($_SESSION['user_id']) && $profileUser['user_id'] == $_SESSION['user_id']) echo 'background-color: #dddddd;'; ?>">
         <a href="profile.php?id=<?php echo $profileUser['user_id']; ?>" class="card-content grey-text text-darken-2 user-card">
             <div class="img">
             <img src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="circle profile-all">

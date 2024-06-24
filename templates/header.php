@@ -101,12 +101,12 @@ if ($user === null) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var elems = document.querySelectorAll('.sidenav');
-    var instances = M.Sidenav.init(elems);
+    let elems = document.querySelectorAll('.sidenav');
+    let instances = M.Sidenav.init(elems);
     
-    var header = document.getElementById('header');
-    var headerHeight = header.offsetHeight; // Get the height of the header
-    var scrollYOffset = <?php echo isset($_SESSION["user_id"]) ? '0' : '94'; ?>; // Set the initial scroll offset based on user login status
+    let header = document.getElementById('header');
+    let headerHeight = header.offsetHeight; // Get the height of the header
+    let scrollYOffset = <?php echo isset($_SESSION["user_id"]) ? '0' : '94'; ?>; // Set the initial scroll offset based on user login status
     
     window.addEventListener('scroll', function() {
         if (window.scrollY > scrollYOffset) {
