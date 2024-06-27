@@ -622,4 +622,5 @@ font-style: italic;
 
 .baby-blue{
   color: #90CAF9;
+  -webkit-text-stroke: 1px black;
 }
