@@ -120,3 +120,23 @@
 </div>
 
 <?php include('templates/footer.php'); ?>
+
+<script>
+$(document).ready(function() {
+    $('#search').on('input', function() {
+        var searchTerm = $(this).val();
+        var userId = "<?php echo $profileUser['user_id']; ?>";
+        $.ajax({
+            url: 'utilities/filter_drafts.php',
+            type: 'GET',
+            data: {
+                search: searchTerm,
+                id: userId
+            },
+            success: function(response) {
+                $('#blogList').html(response);
+            }
+        });
+    });
+});
+</script>
