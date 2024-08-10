@@ -156,40 +156,43 @@
         </div>
 
         <div class="image">
-    <?php if (!empty($profileUser['profile_image'])): ?>
-        <a href="#profileImageModal" class="modal-trigger">
-            <img id="profileImagePreview" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
-        </a>
-        <!-- Modal Structure -->
-        <div id="profileImageModal" class="modal">
+        <?php if (!empty($profileUser['profile_image'])): ?>
+            <a href="#profileImageModal" class="modal-trigger">
+                <img id="profileImagePreview" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
+            </a>
+            <!-- Modal Structure -->
+            <div id="profileImageModal" class="modal">
             <div class="modal-footer">
-                <a href="#!" class="modal-close red btn-flat">Close</a>
-            </div>
-            <div class="modal-content">
-                <img class="profile-image" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image">
-            </div>
-        </div>
-    <?php else: ?>
-        <img id="profileImagePreview" src="images/defaultProfile.jpg" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
-    <?php endif; ?>
+                  <a href="#!" class="modal-close red btn-flat">Close</a>
+                </div>
+                <div class="modal-content">
+                    <img class="profile-image" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image">
+                </div>
 
-    <!-- Form for profile image upload -->
-    <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
-        <!-- Add input field for profile image upload -->
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-            <div class="file-field input-field change-profile-image">
-                <div class="change-image">
-                    <span>Change Profile Image</span>
-                    <input type="file" name="profile_image" id="profile_image_input" accept="image/*">
-                </div>
-                <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text">
-                </div>
             </div>
+        <?php else: ?>
+            <img id="profileImagePreview" src="images/defaultProfile.jpg" alt="Profile Image" class="responsive-img circle" style="width: 150px; height: 150px;">
         <?php endif; ?>
-    </form>
-</div>
+
+        <!-- Form for profile image upload -->
+        <form class="" action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="POST" enctype="multipart/form-data" id="profileImageForm">
+            <!-- Add input field for profile image upload -->
+            <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
+                <div class="file-field input-field change-profile-image">
+                    <div class="change-image">
+                        <span>Change Profile Image</span>
+                        <input type="file" name="profile_image" id="profile_image_input" accept="image/*" onchange="uploadProfileImage()">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            <?php endif; ?>
+        </form>
     </div>
+
+    </div>
+
 
     <!-- Search Bar -->
     <div class="row search-profile">
@@ -214,7 +217,7 @@
     </div>
 </div>
 
-    <div class="container center" id="blogList">
+    <div class="container center">
         <div class="row">
         <h5 class='center grey-text'>                     
             <?php
@@ -227,19 +230,21 @@
         <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
             <a href="drafts.php?id=<?php echo $loggedInUserId; ?>" class="left underline">See Drafts</a>
             <?php endif; ?>
-            <?php foreach($blogs as $blog): ?>
-                <div class="col s12 profile-card" style="border: 1px solid grey;" >
-                    <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
-                        <div class="card-content">
-                            <h6 style="font-weight: bold"><?php echo htmlspecialchars($blog['title']); ?></h6>
-                            <p style="font-size: smaller">Topic: <?php echo htmlspecialchars($blog['topic']); ?></p>
-                            <p style="font-size: smaller">Word Count: <?php echo calculateWordCount($blog['content']); ?></p>
-                            <p style="font-size: smaller">Created On: <?php echo date('d-m-Y', strtotime($blog['date'])); ?></p>
-                            <p style="font-size: smaller">Last Updated: <?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></p>
-                        </div>
-                    </a>
-                </div>
-            <?php endforeach; ?>
+            <div id="blogList">
+                <?php foreach($blogs as $blog): ?>
+                    <div class="col s12 profile-card" style="border: 1px solid grey;" >
+                        <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
+                            <div class="card-content">
+                                <h6 style="font-weight: bold"><?php echo htmlspecialchars($blog['title']); ?></h6>
+                                <p style="font-size: smaller">Topic: <?php echo htmlspecialchars($blog['topic']); ?></p>
+                                <p style="font-size: smaller">Word Count: <?php echo calculateWordCount($blog['content']); ?></p>
+                                <p style="font-size: smaller">Created On: <?php echo date('d-m-Y', strtotime($blog['date'])); ?></p>
+                                <p style="font-size: smaller">Last Updated: <?php echo date('d M Y H:i:s', strtotime($blog['last_updated'])); ?></p>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 
@@ -295,49 +300,46 @@
             });
         });
 
-        $(document).ready(function() {
-    $('#profile_image_input').on('change', function() {
-        console.log("File input changed"); // Add this line
-        uploadProfileImage();
-    });
-});
+        function uploadProfileImage() {
+        let formData = new FormData($('#profileImageForm')[0]);
+        formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
 
-function uploadProfileImage() {
-    let formData = new FormData($('#profileImageForm')[0]);
-    formData.append('user_id', <?php echo $profileUser['user_id']; ?>);
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/upload_profile_image.php',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Parse the JSON response
+                let responseData = JSON.parse(response);
 
-    console.log("Uploading profile image..."); // Add this line
+                // Handle the response
+                console.log(responseData);
 
-    $.ajax({
-        type: 'POST',
-        url: 'utilities/upload_profile_image.php',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            // Parse the JSON response
-            let responseData = JSON.parse(response);
+                if (responseData.status === 'success') {
+                    // Update the profile image on the page
+                    $('#profileImagePreview').attr('src', responseData.profile_image);
 
-            // Handle the response
-            console.log(responseData);
-
-            if (responseData.status === 'success') {
-                // Update the profile image on the page
-                $('#profileImagePreview').attr('src', responseData.profile_image);
-            } else {
-                // Handle the error case
-                console.error(responseData.message);
+                    // Example: $('#someElement').text(responseData.someValue);
+                } else {
+                    // Handle the error case
+                    console.error(responseData.message);
+                }
+            },
+            error: function(error) {
+                // Handle the error
+                console.error(error);
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            // Handle the error
-            console.error("AJAX Error: ", textStatus, errorThrown); // Add this line
-            console.error(jqXHR.responseText); // Add this line
-        }
+        });
+    }
 
-    });
-}
-    
+    $(document).ready(function(){
+            $('.modal').modal();
+        });
+
+        
+
     //For toggling the message button
     function openMessageModal() {
                 $('#messageModal').modal('open');

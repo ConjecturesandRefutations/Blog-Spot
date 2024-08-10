@@ -9,8 +9,6 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$loggedInUserId = $_SESSION["user_id"];
-
 // Check if user_id is provided in the URL
 if (isset($_GET["id"])) {
     $user_id = $_GET["id"];
@@ -42,7 +40,6 @@ if (isset($_GET["id"])) {
     }
     ?>
     <div class="row">
-        <a href="drafts.php?id=<?php echo $loggedInUserId; ?>" class="left underline">See Drafts</a>
         <?php foreach($blogs as $blog): ?>
                 <div class="col s12 profile-card" style="border: 1px solid grey;" >
                     <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">

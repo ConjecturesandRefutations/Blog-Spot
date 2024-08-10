@@ -35,6 +35,7 @@ if ($user === null) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Spot</title>
+    <meta name="description" content="Create engaging blogs effortlessly with our simple platform. No technical skills needed — focus on content, and we handle the rest. Start blogging today!" />
     <link rel="stylesheet" href="./styles.css">
     <link rel="shortcut icon" href="../images/favicon.png" type="image/svg+xml">
     <!-- Materialize CSS linked below -->
@@ -120,4 +121,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
-
