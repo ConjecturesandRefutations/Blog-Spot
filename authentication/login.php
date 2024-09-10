@@ -1,7 +1,20 @@
 <?php
 
-// Set session timeout to 300 minutes
-ini_set('session.gc_maxlifetime', 18000);
+// Set session timeout to one year
+ini_set('session.gc_maxlifetime', 31536000); // 365 days in seconds
+
+// Set cookie lifetime to one year
+session_set_cookie_params([
+    'lifetime' => 31536000, // 365 days in seconds
+    'path' => '/',
+    'domain' => '',
+    'secure' => isset($_SERVER['HTTPS']), // True if using HTTPS
+    'httponly' => true, // Prevent JavaScript access to the session cookie
+    'samesite' => 'Lax' 
+]);
+
+// Start the session
+session_start();
 
 // Start the session
 session_start();
