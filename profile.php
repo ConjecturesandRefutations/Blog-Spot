@@ -115,6 +115,9 @@
 
         <!-- Message Modal -->
         <div id="messageModal" class="modal">
+        <div class="modal-header left" style="position: absolute;">
+                <a href="#!" class="modal-close red hov white-text" style="padding: 5px; border-radius: 5px" onclick="closeModalAndRefresh('messageModal')">Close</a>
+            </div>
             <div class="modal-content">
                 <h4>Compose Message</h4>
                 <form action="utilities/send_message.php" method="POST" id="messageForm">
@@ -126,9 +129,6 @@
                     <button type="submit" class="btn blue z-depth-0">Send <i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a href="#!" class="modal-close btn-flat red hov white-text" onclick="closeModalAndRefresh('messageModal')">Close</a>
-            </div>
         </div>
 
     <?php
@@ -139,8 +139,8 @@
 
         <!-- See Messages Modal -->
     <div id="seeMessagesModal" class="modal">
-    <div class="modal-footer">
-            <a href="#!" class="modal-close red btn-flat white-text" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
+    <div class="modal-header left" style="position: absolute;">
+            <a href="#!" class="modal-close red white-text" style="padding: 5px; border-radius: 5px" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
         </div>
         <div class="modal-content">
             <h4>Messages</h4>
@@ -162,8 +162,8 @@
             </a>
             <!-- Modal Structure -->
             <div id="profileImageModal" class="modal">
-            <div class="modal-footer">
-                  <a href="#!" class="modal-close red btn-flat">Close</a>
+            <div class="modal-header left">
+                  <a href="#!" class="modal-close red white-text" style="padding: 5px; border-radius: 5px">Close</a>
                 </div>
                 <div class="modal-content">
                     <img class="profile-image" src="<?php echo $profileUser['profile_image']; ?>" alt="Profile Image">
@@ -493,7 +493,11 @@ $(document).ready(function () {
  $(document).ready(function () {
     $('.modal').modal({
         closeMethods: ['button', 'overlay'],
-        dismissible: false,
+        dismissible: true,
+        onCloseEnd: function() {
+            // This function will be called when the modal is completely closed
+            location.reload(); // Refresh the page
+        }
     });
 }); 
 
