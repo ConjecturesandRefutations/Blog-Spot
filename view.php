@@ -249,6 +249,19 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
     }
 }
 
+// Include HTMLPurifier library
+require_once 'vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php';
+
+// Configure HTMLPurifier
+$config = HTMLPurifier_Config::createDefault();
+$config->set('HTML.Allowed', 'a[href|target],strong,b,em,i,u,p,ul,ol,li,br,img[src|alt|width|height|style],h1,h2,h3,h4,h5,h6,span[style]');
+$config->set('HTML.ForbiddenElements', 'script,iframe,embed,object');
+
+$purifier = new HTMLPurifier($config);
+
+// Purify the content before displaying
+$clean_content = $purifier->purify($blog['content']);
+
 ?>
 
 <?php include('templates/header.php'); ?>
@@ -390,7 +403,9 @@ if (isset($_FILES['featured_image']) && isset($id)) { // Check if 'id' is set
 
     
     <hr>
-    <div id="editableContent" contenteditable="false" style="white-space: pre-line;"><?php echo htmlspecialchars_decode($blog['content']); ?></div>
+    <div id="editableContent" contenteditable="false">
+        <?php echo $clean_content; ?>
+    </div>
    
     <?php else: ?>
 
@@ -635,13 +650,14 @@ function initializeTinyMCE(editMode) {
             content_css: [
                 '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
                 '//www.tiny.cloud/css/codepen.min.css'
-            ]
+            ],
+                // Disallow dangerous tags
+                invalid_elements: 'script,iframe,embed,object',
         });
     } else {
         tinymce.remove('#editableContent');
     }
 }
-
 
 let feedbackButton = document.getElementById('feedbackButton');
 let feedbackForm = document.getElementById('feedbackForm');

@@ -2,14 +2,14 @@
 
 include('config/db_connect.php');
 
+// Include HTMLPurifier
+require_once 'vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php';
+
 if (session_status() == PHP_SESSION_NONE) {
-    // Start the session only if it's not already started
     session_start();
 }
 
-// Check if the user is not logged in
 if (!isset($_SESSION['user_id'])) {
-    // Redirect to login if not logged in
     header("Location: authentication/login.php");
     exit();
 }
@@ -17,71 +17,72 @@ if (!isset($_SESSION['user_id'])) {
 $title = $topic = $content = '';
 $errors = array('title' =>'', 'topic'=>'', 'content' => '');
 
-if(isset($_POST['submit']) || isset($_POST['draft'])) {
+if (isset($_POST['submit']) || isset($_POST['draft'])) {
     
     // Check title
-    if(empty($_POST['title'])){
+    if (empty($_POST['title'])) {
         $errors['title'] = 'Blog must have a title';
-    } else{
+    } else {
         $title = $_POST['title'];
     }
     
     // Check topic
-    if(empty($_POST['topic'])){
+    if (empty($_POST['topic'])) {
         $errors['topic'] = 'Blog must have a topic';
-    } else{
+    } else {
         $topic = $_POST['topic'];
     }
 
     // Check content
-    if(empty($_POST['content'])){
+    if (empty($_POST['content'])) {
         $errors['content'] = 'You need to write the main content of your blog <br/>';
-    } else{
+    } else {
         $content = $_POST['content'];
     }
 
     if (array_filter($errors)) {
-        // echo 'errors in form';
+        // There are errors in the form
     } else {
-        $title = $_POST['title'];
-        $content = mysqli_real_escape_string($conn, $_POST['content']);
+        // Sanitize content using HTMLPurifier
+        $config = HTMLPurifier_Config::createDefault();
+        
+        // Define the allowed HTML elements and attributes
+        $config->set('HTML.Allowed', 'a[href|target],strong,b,em,i,u,p,ul,ol,li,br,img[src|alt|width|height|style],h1,h2,h3,h4,h5,h6,span[style]');
+        
+        // Disable script tags and other dangerous elements
+        $config->set('HTML.ForbiddenElements', 'script,iframe,embed,object');
+        
+        // Optionally enable caching for better performance
+        $config->set('Cache.DefinitionImpl', null);
+        
+        $purifier = new HTMLPurifier($config);
+
+        // Clean the title and topic (for good measure)
+        $title = mysqli_real_escape_string($conn, $_POST['title']);
         $topic = mysqli_real_escape_string($conn, $_POST['topic']);
-
-        // Convert newlines to HTML line breaks
-        $content = $_POST['content'];
-        $content = str_replace("\r\n", "\n", $content);
-        $content = nl2br($content);
-
-        // Replace HTML line breaks with spaces
-        $content = str_replace('<br />', ' ', $content);
-
+        
+        // Purify the content to allow only safe HTML
+        $content = $purifier->purify($_POST['content']);
+        
         $userId = $_SESSION['user_id']; 
-
         $isDraft = isset($_POST['draft']) ? 1 : 0;
 
         // Use prepared statement
         $stmt = $conn->prepare("INSERT INTO blogs (title, topic, content, user_id, date, is_draft, featured_image) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
         $stmt->bind_param("sssiss", $title, $topic, $content, $userId, $isDraft, $_FILES['featured_image']['name']);
 
-
-
         if ($stmt->execute()) {
-            // success
-            $blog_id = $stmt->insert_id; // Retrieve the inserted blog_id
+            $blog_id = $stmt->insert_id; 
             if ($isDraft) {
                 header("Location: drafts.php?id=" . $_SESSION['user_id']);
             } else {
-                // Pass the blog_id to the upload_featured_image.php script via AJAX
                 echo '<script>';
                 echo 'let blogId = ' . $blog_id . ';';
                 echo 'uploadFeaturedImage();';
                 echo '</script>';
-                header('Location: index.php');
+                header('Location: all_blogs.php');
             }
         }
-        
-
-        // close the statement
         $stmt->close();
     }
 }
@@ -132,19 +133,20 @@ if(isset($_POST['submit']) || isset($_POST['draft'])) {
 <?php include('templates/footer.php'); ?>
 
     <script>
-  document.addEventListener('DOMContentLoaded', function () {
-      tinymce.init({
-         selector: '#content',
-         plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
-         toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-         autosave_ask_before_unload: false,
-         height: 300,
-         content_css: [
-            '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-            '//www.tiny.cloud/css/codepen.min.css'
-         ]
-      });
-   }); 
+document.addEventListener('DOMContentLoaded', function () {
+  tinymce.init({
+    selector: '#content',
+    plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+    toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+    autosave_ask_before_unload: false,
+    height: 300,
+    content_css: [
+      '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+      '//www.tiny.cloud/css/codepen.min.css'
+    ],
+    invalid_elements: 'script,iframe,embed,object',
+  });
+});
 
    function uploadFeaturedImage(blogId) {
     let formData = new FormData();
