@@ -193,33 +193,9 @@
 
     </div>
 
-
-    <!-- Search Bar -->
-    <div class="row search-profile">
-    <div class="col s12 l6 offset-l3">
-        <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
-            <div class="input-field col s12">
-                <i class="material-icons prefix">search</i>
-                <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
-                <label for="search" class="profile-placeholder">
-
-                    <?php
-                    if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
-                        echo "Search Your Blogs by Title or Topic";
-                    } else {
-                        echo "Search " . htmlspecialchars($profileUser['name']) . "'s Blogs by Title or Topic";
-                    }
-                    ?>
-                </label>
-            </div>
-            <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
-        </form>
-    </div>
-</div>
-
     <div class="container center">
         <div class="row">
-        <h5 class='center grey-text'>                     
+        <h5 class='center grey-text blog-profile-title'>                     
             <?php
                     if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
                         echo "Your Blogs";
@@ -227,6 +203,29 @@
                         echo "" . htmlspecialchars($profileUser['name']) . "'s Blogs";
                     }
                     ?></h5>
+
+                        <!-- Search Bar -->
+                        <div class="row search-profile">
+                        <div class="col s12 l6 offset-l3">
+                            <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
+                                <div class="input-field col s12">
+                                    <i class="material-icons prefix">search</i>
+                                    <input class="white" type="text" name="search" id="search" value="<?php echo htmlspecialchars($searchTerm); ?>" />
+                                    <label for="search" class="profile-placeholder">
+
+                                        <?php
+                                        if (isset($loggedInUserId) && isset($profileUser['user_id']) && $profileUser['user_id'] == $loggedInUserId) {
+                                            echo "Search Your Blogs by Title or Topic";
+                                        } else {
+                                            echo "Search " . htmlspecialchars($profileUser['name']) . "'s Blogs by Title or Topic";
+                                        }
+                                        ?>
+                                    </label>
+                                </div>
+                                <input type="hidden" name="id" value="<?php echo isset($profileUser['user_id']) ? $profileUser['user_id'] : ''; ?>">
+                            </form>
+                        </div>
+                    </div>
         <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
             <a href="drafts.php?id=<?php echo $loggedInUserId; ?>" class="left underline">See Drafts</a>
             <?php endif; ?>

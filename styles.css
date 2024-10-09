@@ -624,3 +624,9 @@ font-style: italic;
   color: #90CAF9;
   -webkit-text-stroke: 1px black;
 }
+.blog-profile-title{
+  margin-top: 50px;
+}
+.search-profile{
+  margin-bottom: 0;
+}

@@ -80,7 +80,7 @@ if (isset($_POST['submit']) || isset($_POST['draft'])) {
                 echo 'let blogId = ' . $blog_id . ';';
                 echo 'uploadFeaturedImage();';
                 echo '</script>';
-                header('Location: all_blogs.php');
+                header('Location: index.php');
             }
         }
         $stmt->close();
