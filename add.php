@@ -134,9 +134,9 @@ if (isset($_POST['submit']) || isset($_POST['draft'])) {
 
     <script>
 document.addEventListener('DOMContentLoaded', function () {
-  tinymce.init({
+    tinymce.init({
     selector: '#content',
-    plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+    plugins: 'lists image charmap print preview hr anchor pagebreak link',
     toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
     autosave_ask_before_unload: false,
     height: 300,
@@ -145,6 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
       '//www.tiny.cloud/css/codepen.min.css'
     ],
     invalid_elements: 'script,iframe,embed,object',
+    
+    contextmenu: false // Completely disable TinyMCE's custom context menu
   });
 });
 

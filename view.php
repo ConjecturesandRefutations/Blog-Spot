@@ -643,7 +643,7 @@ function initializeTinyMCE(editMode) {
     if (editMode) {
         tinymce.init({
             selector: '#editableContent',
-            plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+            plugins: 'lists image charmap print preview hr anchor pagebreak link',
             toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
             autosave_ask_before_unload: false,
             height: 300,
@@ -653,6 +653,7 @@ function initializeTinyMCE(editMode) {
             ],
                 // Disallow dangerous tags
                 invalid_elements: 'script,iframe,embed,object',
+                contextmenu: false
         });
     } else {
         tinymce.remove('#editableContent');

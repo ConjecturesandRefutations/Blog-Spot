@@ -628,5 +628,5 @@ font-style: italic;
   margin-top: 50px;
 }
 .search-profile{
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
