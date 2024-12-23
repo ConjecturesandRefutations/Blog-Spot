@@ -1,6 +1,6 @@
 <?php
 // Include database connection
-$mysqli = require __DIR__ . "/../config/db_connect.php";
+$mysqli = require __DIR__ . "/../../config/db_connect.php";
 
 // Check if message_id is provided
 if (isset($_POST['message_id'])) {

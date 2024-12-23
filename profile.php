@@ -111,7 +111,9 @@
         // Display the message button or form
         
     ?>
-        <button class="secondary z-depth-0 button hov white-text" style="border:none;" onclick="openMessageModal()">Send Message <i class="fas fa-paper-plane"></i></button>
+                <a class="secondary z-depth-0 hov white-text" style="padding-left: 5px; padding-right:5px; border-radius: 5px" href="conversation.php?user_id=<?php echo $profileUser['user_id']; ?>" class="white-text seeAndSendMessages">
+                    Send Message &nbsp;<i class="fas fa-envelope"></i>
+                </a>
 
         <!-- Message Modal -->
         <div id="messageModal" class="modal">
@@ -135,22 +137,10 @@
     }
     ?>
     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $profileUser['user_id']) : ?>
-        <button class="secondary z-depth-0 hov white-text" style="border:none;" onclick="seeMessagesModal()" id="seeMessagesButton">See Messages<i class="fas fa-envelope"></i></button>
 
-        <!-- See Messages Modal -->
-    <div id="seeMessagesModal" class="modal">
-    <div class="modal-header left" style="position: absolute;">
-            <a href="#!" class="modal-close red white-text" style="padding: 5px; border-radius: 5px" onclick="closeModalAndRefresh('seeMessagesModal')">Close</a>
-        </div>
-        <div class="modal-content">
-            <h4>Messages</h4>
-            <hr>
-            <div id="messagesContainer">
-                <!-- Messages will be displayed here -->
-            </div>
-        </div>
-
-    </div>
+        <a class="secondary z-depth-0 hov white-text" style="padding-left: 5px; padding-right:5px; border-radius: 5px" href="messages.php" class="white-text seeAndSendMessages" id="seeMessagesButton">
+                    See Messages &nbsp;<i class="fas fa-envelope"></i>
+        </a>
 
     <?php endif; ?>
         </div>

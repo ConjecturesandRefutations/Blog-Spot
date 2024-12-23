@@ -1,5 +1,5 @@
 <?php
-$mysqli = require __DIR__ . "/../config/db_connect.php";
+$mysqli = require __DIR__ . "/../../config/db_connect.php";
 
 if (session_status() == PHP_SESSION_NONE) {
     // Start the session only if it's not already started
@@ -8,7 +8,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate and sanitize the input data
-    $recipient_user_id = $_POST["recipient_user_id"];
+    $receiver_user_id = $_POST["receiver_user_id"];
     $message_content = trim($_POST["message_content"]); // Trim to remove leading and trailing spaces
 
     // Ensure that the user is logged in
@@ -67,7 +67,7 @@ if (isset($_POST['parent_message_id'])) {
  else {
             // It's a new message
             $stmt_insert_message = $mysqli->prepare("INSERT INTO messages (sender_user_id, receiver_user_id, message_content) VALUES (?, ?, ?)");
-            $stmt_insert_message->bind_param("iis", $sender_user_id, $recipient_user_id, $message_content);
+            $stmt_insert_message->bind_param("iis", $sender_user_id, $receiver_user_id, $message_content);
 
             // Execute the prepared statement for a new message
             if ($stmt_insert_message->execute()) {
