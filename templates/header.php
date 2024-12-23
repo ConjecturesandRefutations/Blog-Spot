@@ -55,6 +55,7 @@ if ($user === null) {
     <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
     <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
     <ul id='nav-mobile' class="right">
+
     <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
     <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
     <?php endif; ?>
@@ -81,6 +82,11 @@ if ($user === null) {
 <!-- Mobile Navigation -->
 <ul class="sidenav grey lighten-2" id="mobile-nav">
   <li><a href="#" class="sidenav-close"><i class="fa fa-times"></i></a></li>
+
+  <?php if (basename($_SERVER['PHP_SELF']) !== 'index.php') : ?>
+    <li><a href="index.php" class="home btn orange lighten-3 z-depth-0">Home</a></li>
+  <?php endif; ?>  
+
   <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
     <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
   <?php endif; ?>  

@@ -40,279 +40,175 @@ $otherUser = $result->fetch_assoc();
         <div id="messagesContainer" style="max-height: 500px; overflow-y: scroll;">
             <!-- Messages will be loaded here -->
         </div>
-        <form id="messageForm" enctype="multipart/form-data">
+        <form id="messageForm">
             <div class="input-field">
                 <textarea id="message_content" name="message_content" class="materialize-textarea"></textarea>
                 <label for="message_content">Type your message...</label>
                 <div id="errorMessage" style="color: red; display: none;"></div>
             </div>
-            <section class="message-action-buttons">
-            <div class="file-field input-field message-media-input">
-                <i class="fa-solid fa-photo-film media-message-icon tooltipped" data-tooltip="Add photo or video" id="upload_icon"></i>
-                    <input type="file" class="message_media" id="message_media" name="message_media" accept="image/*,video/*">
-                <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text" placeholder="Add photo or video">
-                </div>
-            </div>
             <button type="submit" class="btn blue z-depth-0">Send <i class="fas fa-paper-plane"></i></button>
-            <div id="mediaPreviewContainer"></div>
-            </section>
         </form>
     </div>
-</div>
-
-<!-- Modal for Viewing Larger Images -->
-<div id="imageModal" class="modal">
-  <div class="modal-header">
-    <a href="#!" class="modal-close btn-flat">Close</a>
-  </div>
-  <div class="modal-content">
-    <img id="modalImage" class="responsive-img" alt="Expanded view">
-  </div>
 </div>
 
 <?php include('templates/footer.php'); ?>
 
 <script>
     $(document).ready(function() {
+        const otherUserId = <?php echo $otherUserId; ?>;
+        const currentUserId = <?php echo $currentUserId; ?>;
 
-    let elems = document.querySelectorAll('.tooltipped');
-    let instances = M.Tooltip.init(elems);
+        let isAtBottom = true; // Track if the user is at the bottom of the messages container
 
-    const modalElems = document.querySelectorAll('.modal');
-    M.Modal.init(modalElems);
+        // Fetch and display messages
+        fetchMessages();
 
-    const otherUserId = <?php echo $otherUserId; ?>;
-    const currentUserId = <?php echo $currentUserId; ?>;
-    
-    let isAtBottom = true; // Track if the user is at the bottom of the messages container
+        // Fetch messages function
+        function fetchMessages() {
+            $.ajax({
+                type: 'GET',
+                url: 'utilities/messaging/fetch_conversation.php',
+                data: { user_id: otherUserId },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        if (response.messages.length === 0) {
+                            $('#messagesContainer').html('<p>Write the first message!</p>');
+                        } else {
+                            displayMessages(response.messages);
+                        }
 
-    // Fetch and display messages
-    fetchMessages();
+                        if (isAtBottom) {
+                            $('#messagesContainer').scrollTop($('#messagesContainer')[0].scrollHeight);
+                        }
 
-    // Fetch messages function
-    function fetchMessages() {
-        $.ajax({
-            type: 'GET',
-            url: 'utilities/messaging/fetch_conversation.php',
-            data: { user_id: otherUserId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    if (response.messages.length === 0) {
-                        $('#messagesContainer').html('<p>Write the first message!</p>');
+                        markMessagesAsRead(otherUserId);
                     } else {
-                        displayMessages(response.messages);
+                        $('#messagesContainer').html('<p>Write the first message!</p>');
                     }
-
-                    // Check if the user is at the bottom of the container
-                    if (isAtBottom) {
-                        $('#messagesContainer').scrollTop($('#messagesContainer')[0].scrollHeight);
-                    }
-
-                    // Mark messages as read after they are displayed
-                    markMessagesAsRead(otherUserId);
-                } else {
-                    $('#messagesContainer').html('<p>Write the first message!</p>');
+                },
+                error: function(error) {
+                    console.error('Error fetching messages:', error);
                 }
-            },
-            error: function(error) {
-                console.error('Error fetching messages:', error);
-            }
-        });
-    }
-
-    // Display messages function
-    function displayMessages(messages) {
-        let html = '';
-        messages.forEach(function(message) {
-            let messageClass = message.sender_user_id == currentUserId ? 'sent-message' : 'received-message';
-            let mediaHtml = '';
-
-            if (message.media_path && message.media_type) {
-                if (message.media_type === 'image') {
-                    mediaHtml = `<img src="${message.media_path}" 
-                                    alt="Sent Image" 
-                                    class="responsive-img message-image" 
-                                    style="max-width: 200px; max-height: 300px; cursor: pointer;"><br>`;
-                } else if (message.media_type === 'video') {
-                    mediaHtml = `<video controls class="responsive-video" 
-                                    style="max-width: 200px; max-height: 300px">
-                                    <source src="${message.media_path}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video><br>`;
-                }
-            }
-
-            html += `
-            <div class="${messageClass}">
-                <p>${message.message_content}</p>
-                ${mediaHtml}
-                <span>${message.timestamp}</span>
-                <p 
-                    class="delete-message red-text" 
-                    style="border: none" 
-                    data-message-id="${message.message_id}" 
-                    data-receiver-id="${message.receiver_user_id}" 
-                    data-sender-id="${message.sender_user_id}" 
-                    data-message-content="${message.message_content}"
-                >
-                    Delete
-                </p>
-            </div>
-            `;
-        });
-        $('#messagesContainer').html(html);
-
-        // Attach click event listener to dynamically added images
-        $('.message-image').on('click', function() {
-            const imageSrc = $(this).attr('src');
-            $('#modalImage').attr('src', imageSrc);
-            const modal = M.Modal.getInstance($('#imageModal'));
-            modal.open();
-        });
-
-        // Add event listeners for delete buttons
-        $('.delete-message').click(function() {
-            const messageId = $(this).data('message-id');
-            const receiverId = $(this).data('receiver-id');
-            const senderId = $(this).data('sender-id');
-            const messageContent = $(this).data('message-content');
-
-            if (confirm('Are you sure you want to delete this message?')) {
-                deleteMessage(messageId, receiverId, senderId, messageContent);
-            }
-        });
-    }
-
-    // Function to delete a message
-    function deleteMessage(messageId, receiverId, senderId, messageContent) {
-        $.ajax({
-            type: 'POST',
-            url: 'utilities/messaging/delete_message.php',
-            data: { 
-                message_id: messageId,
-                receiver_id: receiverId,
-                sender_id: senderId,
-                message_content: messageContent
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    // Refresh messages after deletion
-                    fetchMessages();
-                } else {
-                    alert('Error deleting message: ' + response.message);
-                }
-            },
-            error: function(error) {
-                console.error('Error deleting message:', error);
-            }
-        });
-    }
-
-        // Event listener to clear the error message when typing starts
-    $('#message_content').on('input', function() {
-        $('#errorMessage').hide(); // Hide the error message
-    });
-
-    // Event listener to clear the error message when a media file is uploaded
-    $('#message_media').change(function() {
-        $('#errorMessage').hide(); // Hide the error message
-    });
-
-    // Handle message form submission
-    $('#messageForm').submit(function (e) {
-        e.preventDefault(); // Prevent default form submission
-
-        // Create a FormData object to handle text and file data
-        let formData = new FormData(this);
-
-        // Append the receiver's ID if needed
-        formData.append('receiver_user_id', otherUserId);
-
-        $.ajax({
-            type: 'POST',
-            url: 'utilities/messaging/send_message.php', // Adjust to your backend endpoint
-            data: formData,
-            contentType: false, // Required for FormData
-            processData: false, // Prevent jQuery from processing data
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success') {
-                    $('#message_content').val(''); // Clear the message content
-                    $('#message_media').val('');   // Clear the file input
-                    $('#mediaPreviewContainer').empty(); // Clear the media preview
-                    fetchMessages();              // Refresh messages
-                } else {
-                    $('#errorMessage').text(response.message).show();
-                }
-            },
-            error: function (error) {
-                console.error('Error sending message:', error);
-            }
-        });
-    });
-
-    // Refresh messages every 5 seconds
-    setInterval(fetchMessages, 5000); 
-
-    // Function to mark messages as read
-    function markMessagesAsRead(userId) {
-        $.ajax({
-            type: 'POST',
-            url: 'utilities/messaging/mark_messages_read.php',
-            data: { user_id: userId },
-            success: function(response) {
-                console.log('Messages marked as read:', response);
-            },
-            error: function(error) {
-                console.error('Error marking messages as read:', error);
-            }
-        });
-    }
-
-    // Mark messages as read when the page is loaded
-    markMessagesAsRead(otherUserId); 
-
-    // Event listener to track scroll position
-    $('#messagesContainer').on('scroll', function() {
-        const scrollTop = $(this).scrollTop();
-        const scrollHeight = $(this)[0].scrollHeight;
-        const clientHeight = $(this).innerHeight();
-
-        // Check if the user is at the bottom
-        isAtBottom = scrollTop + clientHeight >= scrollHeight;
-    });
-});
-
-// Event listener to handle file selection and display a preview
-$('#message_media').change(function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const mediaPreviewContainer = $('#mediaPreviewContainer');
-            mediaPreviewContainer.empty(); // Clear previous previews
-
-            const fileReader = new FileReader();
-
-            // Preview the file based on its type (image or video)
-            fileReader.onload = function(e) {
-                let mediaHtml = '';
-                const mediaType = file.type.split('/')[0]; // image or video
-
-                if (mediaType === 'image') {
-                    mediaHtml = `<img src="${e.target.result}" alt="Image Preview" class="responsive-img" style="max-width: 150px; max-height: 150px; margin-top:-20px">`;
-                } else if (mediaType === 'video') {
-                    mediaHtml = `<video controls class="responsive-video" style="margin-top:-20px; max-width: 150px !important; max-height: 150px !important;"><source src="${e.target.result}" type="${file.type}">Your browser does not support the video tag.</video>`;
-                }
-
-                mediaPreviewContainer.html(mediaHtml); // Append the preview
-            };
-
-            fileReader.readAsDataURL(file); // Read the file as data URL
+            });
         }
-    });
 
+        // Display messages function
+        function displayMessages(messages) {
+            let html = '';
+            messages.forEach(function(message) {
+                let messageClass = message.sender_user_id == currentUserId ? 'sent-message' : 'received-message';
+                html += `
+                <div class="${messageClass}">
+                    <p>${message.message_content}</p>
+                    <span>${message.timestamp}</span>
+                    <p 
+                        class="delete-message red-text" 
+                        style="border: none" 
+                        data-message-id="${message.message_id}" 
+                        data-receiver-id="${message.receiver_user_id}" 
+                        data-sender-id="${message.sender_user_id}" 
+                        data-message-content="${message.message_content}"
+                    >
+                        Delete
+                    </p>
+                </div>
+                `;
+            });
+            $('#messagesContainer').html(html);
+
+            $('.delete-message').click(function() {
+                const messageId = $(this).data('message-id');
+                const receiverId = $(this).data('receiver-id');
+                const senderId = $(this).data('sender-id');
+                const messageContent = $(this).data('message-content');
+
+                if (confirm('Are you sure you want to delete this message?')) {
+                    deleteMessage(messageId, receiverId, senderId, messageContent);
+                }
+            });
+        }
+
+        // Function to delete a message
+        function deleteMessage(messageId, receiverId, senderId, messageContent) {
+            $.ajax({
+                type: 'POST',
+                url: 'utilities/messaging/delete_message.php',
+                data: { 
+                    message_id: messageId,
+                    receiver_id: receiverId,
+                    sender_id: senderId,
+                    message_content: messageContent
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        fetchMessages();
+                    } else {
+                        alert('Error deleting message: ' + response.message);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error deleting message:', error);
+                }
+            });
+        }
+
+        $('#message_content').on('input', function() {
+            $('#errorMessage').hide();
+        });
+
+        $('#messageForm').submit(function (e) {
+            e.preventDefault();
+
+            let formData = $(this).serialize();
+            formData += `&receiver_user_id=${otherUserId}`;
+
+            $.ajax({
+                type: 'POST',
+                url: 'utilities/messaging/send_message.php',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        $('#message_content').val('');
+                        fetchMessages();
+                    } else {
+                        $('#errorMessage').text(response.message).show();
+                    }
+                },
+                error: function (error) {
+                    console.error('Error sending message:', error);
+                }
+            });
+        });
+
+        setInterval(fetchMessages, 5000);
+
+        function markMessagesAsRead(userId) {
+            $.ajax({
+                type: 'POST',
+                url: 'utilities/messaging/mark_messages_read.php',
+                data: { user_id: userId },
+                success: function(response) {
+                    console.log('Messages marked as read:', response);
+                },
+                error: function(error) {
+                    console.error('Error marking messages as read:', error);
+                }
+            });
+        }
+
+        markMessagesAsRead(otherUserId);
+
+        $('#messagesContainer').on('scroll', function() {
+            const scrollTop = $(this).scrollTop();
+            const scrollHeight = $(this)[0].scrollHeight;
+            const clientHeight = $(this).innerHeight();
+
+            isAtBottom = scrollTop + clientHeight >= scrollHeight;
+        });
+    });
 </script>
 
 <style>
@@ -335,50 +231,6 @@ $('#message_media').change(function(event) {
     #messagesContainer {
         border: 1px solid #ccc;
         padding: 10px;
-        max-height: 50vh !important;
+        margin: 20px 0;
     }
-
-    .back-to-messages {
-        cursor: pointer;
-        font-size: 20px;
-        position: absolute;
-        top: 75px;
-        left: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .back-to-messages:hover{
-    background: white
-    }
-
-    .conversation-title {
-        margin-top: 50px;
-    }
-
-    .delete-message{
-        cursor: pointer;
-        max-width: 60px;
-    }
-
-    .message-action-buttons{
-    display: flex;
-    flex-direction: row;
-}
-
-.message-media-input{
-    max-width: 55px !important
-}
-
-.media-message-icon{
-    margin-top: -20px !important
-}
-
-.message_media{
-    margin-top: -20px !important
-}
-
-.responsive-video{
-    max-height: 200px !important;
-    max-width: 200px !important;
-}
 </style>
