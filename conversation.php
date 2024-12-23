@@ -231,6 +231,34 @@ $otherUser = $result->fetch_assoc();
     #messagesContainer {
         border: 1px solid #ccc;
         padding: 10px;
-        margin: 20px 0;
+        max-height: 50vh !important;
     }
+
+    .back-to-messages {
+        cursor: pointer;
+        font-size: 20px;
+        position: absolute;
+        top: 75px;
+        left: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-to-messages:hover{
+    background: white
+    }
+
+    .conversation-title {
+        margin-top: 50px;
+    }
+
+    .delete-message{
+        cursor: pointer;
+        max-width: 60px;
+    }
+
+    .message-action-buttons{
+    display: flex;
+    flex-direction: row;
+}
+
 </style>
