@@ -21,7 +21,7 @@ if (isset($_POST['delete'])) {
 
     if ($isDraft == 0) {
         // If the deleted blog is not a draft, redirect to index.php
-        $redirectLocation = 'all_blogs.php';
+        $redirectLocation = 'index.php';
     } else {
         // If the deleted blog is a draft, redirect to drafts.php
         $redirectLocation = 'drafts.php?id=' . $_SESSION['user_id'];
