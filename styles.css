@@ -649,3 +649,9 @@ font-style: italic;
 .thumb_up, .thumb_down{margin-right:5px}
     
 }
+
+@media(min-width:2000px){
+    .user-card .img{
+        left: 28%
+    }
+}
