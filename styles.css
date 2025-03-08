@@ -318,11 +318,16 @@ font-style: italic;
     margin-top: 6px !important;
     left: 90% !important;
   }
-  .bell-text{
-    color: #32363d;
+  #message-notifications-dropdown{
     position: absolute;
-    left: 60%;
-    top: -5px;
+    left: 50%;
+    top: -3px;
+  }
+  .bell-text{
+    color: #010100 !important;
+}
+.red-text{
+  color: red !important;
 }
 }
 
