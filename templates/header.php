@@ -1,12 +1,25 @@
 <?php
+
+require_once realpath(__DIR__ . '/../config/base_path.php');
+require_once realpath(__DIR__ . '/../config/db_connect.php');
+
+require_once realpath(__DIR__ . '/../utilities/notifications/fetch_message_notifications.php');
+
 if (session_status() == PHP_SESSION_NONE) {
     // Start the session only if it's not already started
     session_start();
 }
+
 $user = null; // Initialize the $user variable
 
 if (isset($_SESSION["user_id"])) {
-    $mysqli = require __DIR__ . "/../config/db_connect.php";
+
+  $loggedInUserId = $_SESSION["user_id"];
+
+  $messageNotifications = fetchMessageNotifications($loggedInUserId, $mysqli); // Fetch message notifications
+
+  $totalMessageNotifications = count($messageNotifications); // Count message notifications
+
     $sql = "SELECT * FROM user WHERE user_id = {$_SESSION["user_id"]}";
     $result = $mysqli->query($sql);
     $user = $result->fetch_assoc();
@@ -26,6 +39,15 @@ if ($user === null) {
     echo '</div>';
     echo '</div>';
 }
+
+function getFirstWords($string, $word_limit) {
+  $words = explode(' ', $string);
+  if (count($words) <= $word_limit) {
+      return $string; // If the content has fewer or equal words than the limit, return the whole string.
+  } else {
+      return implode(' ', array_slice($words, 0, $word_limit)) . '...'; // Return the first $word_limit words followed by ellipsis.
+  }
+} 
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +64,7 @@ if ($user === null) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- font awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Font Awesome-->
@@ -54,10 +77,12 @@ if ($user === null) {
     <div class="container header-container">
     <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
     <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
-    <ul id='nav-mobile' class="right">
+    <ul class="right">
+
+    <span id='nav-desktop'>
 
     <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
-    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
+    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">Users</a></li>
     <?php endif; ?>
 
 <?php if (isset($_SESSION["user_id"])) : ?>
@@ -73,10 +98,45 @@ if ($user === null) {
 <?php endif; ?>
 
 
-  <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="write btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>   </ul>
+  <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="write btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>   
     
+    </span>
+  <?php if (isset($_SESSION["user_id"])) : ?>
+
+<li class="dropdown-all">
+          <a class="menu-item dropdown-trigger" href="#!" id="message-notifications-dropdown" data-target="message-notifications-dropdown-list">
+              <i class="material-icons bell <?php echo $totalMessageNotifications > 0 ? 'red-text' : 'bell-text'; ?>">mail</i>
+              <span class="new" data-badge-caption="" style="<?php echo $totalMessageNotifications > 0 ? '' : 'display:none;'; ?>">
+                  <?php echo $totalMessageNotifications; ?>
+              </span>
+          </a>
+          <?php if ($totalMessageNotifications > 0): ?>
+              <ul id="message-notifications-dropdown-list" class="dropdown-content">
+                  <?php foreach ($messageNotifications as $notification): ?>
+                      <li>
+                      <a href="<?php echo BASE_URL; ?>conversation.php?user_id=<?php echo htmlspecialchars($notification['sender_id']); ?>">
+                          New message from <?php echo htmlspecialchars($notification['name']); ?>
+                      </a>
+                          <hr/>
+                      </li>
+                  <?php endforeach; ?>
+              </ul>
+          <?php else: ?>
+              <ul id="message-notifications-dropdown-list" class="dropdown-content">
+                  <li class="no-notifications">No new messages</li>
+                  <li class="see-all-messages"><a style="color: #64B5F6;" href="<?php echo htmlspecialchars(BASE_URL); ?>messages.php" aria-label="View all messages">All Messages</a></li>
+                  </ul>
+          <?php endif; ?>
+      </li>
+
+<?php endif; ?>
+
+  </ul>
+
     <a href="#" data-target="mobile-nav" class="sidenav-trigger" id="burger-anchor"><img src="images/burger.png" alt="burger menu" class="fa fa-bars black-text" id="burger-img"></a>
     </div>
+
+
 </nav>
 
 <!-- Mobile Navigation -->
@@ -88,7 +148,7 @@ if ($user === null) {
   <?php endif; ?>  
 
   <?php if (basename($_SERVER['PHP_SELF']) !== 'all-users.php') : ?>
-    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">All Users</a></li>
+    <li><a href="all-users.php" class="profile btn green lighten-3 z-depth-0">Users</a></li>
   <?php endif; ?>  
 
   <?php if (isset($_SESSION["user_id"])) : ?>
@@ -108,6 +168,15 @@ if ($user === null) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+  var dropdowns = document.querySelectorAll('.dropdown-trigger');
+      M.Dropdown.init(dropdowns, {
+          coverTrigger: false,
+          constrainWidth: false,
+          closeOnClick: false
+      });
+
+    
     let elems = document.querySelectorAll('.sidenav');
     let instances = M.Sidenav.init(elems);
     
@@ -124,6 +193,56 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.style.paddingTop = 0; // Remove the padding when the header is no longer sticky
         }
     });
+});
+
+function updateMessageNotifications(data) {
+      const notifications = data.message_notifications;
+      const messageBadge = document.querySelector("#message-notifications-dropdown .new");
+      const messageDropdown = document.getElementById("message-notifications-dropdown-list");
+
+      // Update badge and icon styling
+      const messageIcon = document.querySelector("#message-notifications-dropdown i");
+      if (notifications.length > 0) {
+        messageIcon.classList.add("red-text");
+        if (messageBadge) {
+          messageBadge.textContent = notifications.length;
+          messageBadge.style.display = "inline";
+        }
+      } else {
+        messageIcon.classList.remove("red-text");
+        if (messageBadge) messageBadge.style.display = "none";
+      }
+
+        // Build the dropdown content
+        let html = "";
+        if (notifications.length > 0) {
+          notifications.forEach(notification => {
+            html += `
+              <li>
+                <a href="<?php echo BASE_URL; ?>conversation.php?user_id=${notification.sender_id}">
+                  New message from ${name}
+                </a>
+                <hr/>
+              </li>
+            `;
+          });
+        } else {
+          html += `
+            <li class="no-notifications">No new messages</li>
+            <li style="border-top:1px solid grey" class="see-all-messages">
+              <a style="color: #64B5F6" href="<?php echo BASE_URL; ?>messages.php" aria-label="View all messages">All Messages</a>
+            </li>
+          `;
+        }
+        messageDropdown.innerHTML = html;
+      }
+
+      document.addEventListener("click", function(event) {
+    const target = event.target.closest(".see-all-messages a");
+    if (target) {
+        event.preventDefault(); // Prevent default to avoid potential conflicts
+        window.location.href = target.href; // Force navigation
+    }
 });
 
 </script>

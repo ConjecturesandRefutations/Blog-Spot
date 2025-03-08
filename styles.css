@@ -307,8 +307,8 @@ font-style: italic;
 .placeholder{ position: absolute !important; left: 3% !important; } 
 .profile-placeholder{ position: absolute !important; left: 5% !important; }
 
-@media (max-width: 800px) {
-  #nav-mobile {
+@media (max-width: 818px) {
+  #nav-desktop {
     display: none !important;
   }
   #burger-anchor,#burger-img{
@@ -318,6 +318,12 @@ font-style: italic;
     margin-top: 6px !important;
     left: 90% !important;
   }
+  .bell-text{
+    color: #32363d;
+    position: absolute;
+    left: 60%;
+    top: -5px;
+}
 }
 
 @media (min-width: 500px) {
@@ -455,7 +461,20 @@ font-style: italic;
   padding-left: 5%;
 }
 
-.change-image{
+.bell-text{
+  color: #8b8b8b;
+}
+.bell{
+  font-size: 30px !important;
+  margin-top: 3px
+}
+.no-notifications{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #8A8B8A;
+  }
+
+.change-image{  
   border: 1px solid black;
   border-radius: 50px;
   padding: 0;
@@ -604,6 +623,18 @@ font-style: italic;
 
 .tox-statusbar__right-container{
   display: none !important;
+}
+
+.dropdown-trigger{
+  display: flex;
+  flex-direction: row;
+  column-gap: 5px
+}
+#message-notifications-dropdown-list{
+    overflow: visible
+}
+.new{
+    color: #606061
 }
 
 @media(max-width: 500px){

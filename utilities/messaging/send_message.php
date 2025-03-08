@@ -63,7 +63,6 @@ if (isset($_POST['parent_message_id'])) {
     }
 }
 
-
  else {
             // It's a new message
             $stmt_insert_message = $mysqli->prepare("INSERT INTO messages (sender_user_id, receiver_user_id, message_content) VALUES (?, ?, ?)");
@@ -75,15 +74,23 @@ if (isset($_POST['parent_message_id'])) {
                 $inserted_message_id = $stmt_insert_message->insert_id;
                 $stmt_insert_message->close();
 
-                mysqli_close($mysqli);
-                echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
-                exit();
+            // Add internal notification for the new message
+            $query_notification = "INSERT INTO message_notifications (receiver_id, sender_id, message_content, message_id) VALUES (?, ?, ?, ?)";
+            $stmt_notification = $mysqli->prepare($query_notification);
+            $stmt_notification->bind_param("iisi", $receiver_user_id, $sender_user_id, $message_content, $inserted_message_id);
+
+            if ($stmt_notification->execute()) {
+                $stmt_notification->close();
             } else {
-                // Error inserting message
-                $stmt_insert_message->close();
+                echo json_encode(['status' => 'error', 'message' => 'Error inserting notification.', 'mysqli_error' => mysqli_error($mysqli)]);
                 mysqli_close($mysqli);
-                echo json_encode(['status' => 'error', 'message' => 'Error sending message.', 'mysqli_error' => mysqli_error($mysqli)]);
                 exit();
+            }
+
+            mysqli_close($mysqli);
+            echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
+            exit();
+
             }
         }
     } else {
