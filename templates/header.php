@@ -182,13 +182,13 @@ function getFirstWords($string, $word_limit) {
 
 <?php endif; ?>
 
+
                   </span>
 
   </ul>
-
-    <a href="#" data-target="mobile-nav" class="sidenav-trigger" id="burger-anchor"><i class="fa-solid fa-bars"></i></a>
     </div>
 
+    <a href="#" data-target="mobile-nav" class="sidenav-trigger right" id="burger-anchor"><i class="fa-solid fa-bars"></i></a>
 
 </nav>
 

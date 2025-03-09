@@ -424,7 +424,7 @@ $clean_content = $purifier->purify($blog['content']);
                             <form class="delete-feedback-form" action="utilities/delete_feedback.php" method="POST" style="display: inline;">
                                 <input type="hidden" name="feedback_id" value="<?php echo $fb['feedback_id']; ?>">
                                 <input type="hidden" name="blog_id" value="<?php echo $fb['blog_id']; ?>">
-                                <button type="submit" name="delete_feedback" class="btn red lighten-3 z-depth-0">Delete</button>
+                                <button type="submit" name="delete_feedback" class="btn red lighten-3 z-depth-0 delete-feedback-btn">Delete</button>
                             </form>
                         <?php endif; ?>
                     </li>
@@ -465,6 +465,41 @@ $(document).ready(function() {
                 $('#feedbackResponse').html('<p>Error: ' + errorThrown + '</p>');
             }
         });
+    });
+
+ $('.delete-feedback-btn').click(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Show the confirmation dialog
+        var confirmDelete = confirm("Are you sure you want to delete your feedback?");
+        
+        if (confirmDelete) {
+            var feedbackId = $(this).closest('form').find('input[name="feedback_id"]').val();
+            var blogId = $(this).closest('form').find('input[name="blog_id"]').val();
+
+            // Send AJAX request to delete the feedback
+            $.ajax({
+                url: 'utilities/delete_feedback.php',
+                type: 'POST',
+                data: {
+                    delete_feedback: true,
+                    feedback_id: feedbackId,
+                    blog_id: blogId
+                },
+                success: function(response) {
+                    // Fade out and remove the feedback item
+                    $('#feedback_' + feedbackId).fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    alert('Error deleting feedback');
+                }
+            });
+        } else {
+            // If the user cancels, do nothing and return
+            return false;
+        }
     });
 });
 

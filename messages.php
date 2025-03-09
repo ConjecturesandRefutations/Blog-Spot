@@ -59,17 +59,17 @@ $currentUserId = $_SESSION['user_id'];
             conversations.forEach(function(conversation) {
                 html += `
                     <div class="col">
+                    <a href="conversation.php?user_id=${conversation.user_id}" class="conversation-card-link">
                         <div class="card hoverable">
                             <div class="card-content">
                                 <span class="card-title">${conversation.name}</span>
+                                <hr>
                                 <p><strong>Last message:</strong> ${conversation.last_message}</p>
                                 <p><small>${conversation.last_message_time}</small></p>
                                 ${conversation.unread_count > 0 ? `<p class="red-text"><strong>${conversation.unread_count} unread message(s)</strong></p>` : ''}
                             </div>
-                            <div class="card-action">
-                                <a href="conversation.php?user_id=${conversation.user_id}" class="btn">Open Conversation</a>
-                            </div>
                         </div>
+                        </a>
                     </div>
                 `;
             });

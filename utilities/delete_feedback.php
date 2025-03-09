@@ -11,11 +11,11 @@ if (isset($_POST['delete_feedback'])) {
     $deleteFeedbackSql = "DELETE FROM feedback WHERE feedback_id = $feedback_id";
 
     if (mysqli_query($conn, $deleteFeedbackSql)) {
-        // Success
-        header("Location: ../view.php?id=$blog_id");
+        // Return a success response for AJAX
+        echo 'success';
     } else {
-        // Failure
-        echo 'query error: ' . mysqli_error($conn);
+        // Return an error message for AJAX
+        echo 'error: ' . mysqli_error($conn);
     }
 }
 

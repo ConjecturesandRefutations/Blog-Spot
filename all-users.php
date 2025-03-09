@@ -65,32 +65,32 @@ function calculateWordCount($content) {
     <div class="row" id="user-list">
         <?php foreach ($users as $profileUser) : ?>
             <div class="col s12 m6 l4">
-                <div class="card <?php if (isset($_SESSION['user_id']) && $profileUser['user_id'] == $_SESSION['user_id']) echo 'grey lighten-3'; ?>">
-                    <div class="card-content">
-                        <div class="center-align">
-                            <img src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="circle responsive-img" style="width: 80px; height: 80px;">
-                        </div>
-                        <div class="user-info center-align">
-                            <h6 class="black-text" style="font-weight: bold;"> <?php echo htmlspecialchars($profileUser['name']); ?> </h6>
-                            <p class="grey-text text-darken-2">Total Blogs: <?php echo $profileUser['numBlogs']; ?></p>
-                            
-                            <?php 
-                            $totalWords = 0;
-                            $blogsResult = mysqli_query($conn, "SELECT content FROM blogs WHERE user_id = {$profileUser['user_id']} AND is_draft = 0");
-                            while ($blog = mysqli_fetch_assoc($blogsResult)) {
-                                $totalWords += calculateWordCount($blog['content']);
-                            }
-                            mysqli_free_result($blogsResult);
-                            ?>
-                            <p class="grey-text text-darken-2">Total Words: <?php echo $totalWords; ?></p>
-                            <p class="grey-text text-darken-2 favourite-topic">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
-                        </div>
-                    </div>
-                    <div class="card-action center-align">
-                        <a href="profile.php?id=<?php echo $profileUser['user_id']; ?>" class="btn blue lighten-1 waves-effect waves-light">View Profile</a>
-                    </div>
+    <a href="profile.php?id=<?php echo $profileUser['user_id']; ?>" class="card-link">
+        <div class="card <?php if (isset($_SESSION['user_id']) && $profileUser['user_id'] == $_SESSION['user_id']) echo 'grey lighten-3'; ?>">
+            <div class="card-content">
+                <div class="center-align">
+                    <img src="<?php echo (!empty($profileUser['profile_image'])) ? $profileUser['profile_image'] : 'images/defaultProfile.jpg'; ?>" alt="Profile Image" class="circle responsive-img" style="width: 80px; height: 80px;">
+                </div>
+                <div class="user-info center-align">
+                    <h6 class="black-text" style="font-weight: bold;"><?php echo htmlspecialchars($profileUser['name']); ?></h6>
+                    <p class="grey-text text-darken-2">Total Blogs: <?php echo $profileUser['numBlogs']; ?></p>
+
+                    <?php 
+                    $totalWords = 0;
+                    $blogsResult = mysqli_query($conn, "SELECT content FROM blogs WHERE user_id = {$profileUser['user_id']} AND is_draft = 0");
+                    while ($blog = mysqli_fetch_assoc($blogsResult)) {
+                        $totalWords += calculateWordCount($blog['content']);
+                    }
+                    mysqli_free_result($blogsResult);
+                    ?>
+                    <p class="grey-text text-darken-2">Total Words: <?php echo $totalWords; ?></p>
+                    <p class="grey-text text-darken-2 favourite-topic">Favourite Topic: <?php echo htmlspecialchars($profileUser['favoriteTopic']); ?></p>
                 </div>
             </div>
+        </div>
+    </a>
+</div>
+
 <?php endforeach; ?>
 
     </div>
@@ -114,11 +114,12 @@ $(document).ready(function() {
                 users.forEach(function(profileUser) {
                     var userCard = `
                         <div class="col s12 m6 l4" data-user-id="${profileUser.user_id}">
+                           <a href="profile.php?id=${profileUser.user_id}" class="card-link">
                             <div class="card ${profileUser.isCurrentUser ? 'grey lighten-3' : ''}">
                                 <div class="card-content">
                                     <div class="center-align">
                                         <img src="${profileUser.profile_image ? profileUser.profile_image : 'images/defaultProfile.jpg'}" 
-                                             alt="Profile Image" class="circle responsive-img profile-all" style="width: 80px; height: 80px;">
+                                            alt="Profile Image" class="circle responsive-img profile-all" style="width: 80px; height: 80px;">
                                     </div>
                                     <div class="user-info center-align">
                                         <h6 class="black-text user-name" style="font-weight: bold;">${profileUser.name}</h6>
@@ -127,11 +128,9 @@ $(document).ready(function() {
                                         <p class="grey-text text-darken-2 favourite-topic">Favourite Topic: ${profileUser.favoriteTopic}</p>
                                     </div>
                                 </div>
-                                <div class="card-action center-align">
-                                    <a href="profile.php?id=${profileUser.user_id}" class="btn blue lighten-1 waves-effect waves-light">View Profile</a>
-                                </div>
                             </div>
-                        </div>`;
+                        </a>
+`;
                     userList.append(userCard);
                 });
             }

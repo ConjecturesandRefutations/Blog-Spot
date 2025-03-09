@@ -131,6 +131,16 @@ $otherUser = $result->fetch_assoc();
     }
 
     function deleteMessage(messageId) {
+    // Find the message element based on the data-message-id attribute
+    var messageElement = $('.sent-message').filter(function() {
+        return $(this).find('.delete-message').data('message-id') === messageId;
+    });
+
+    console.log(messageElement); // Check if the message is correctly selected
+
+    // Fade out the message element
+    messageElement.fadeOut(300, function() {
+        // After fade-out is complete, delete the message via AJAX
         $.ajax({
             type: 'POST',
             url: 'utilities/messaging/delete_message.php',
@@ -141,14 +151,16 @@ $otherUser = $result->fetch_assoc();
                     fetchMessages();
                 } else {
                     alert('Error deleting message: ' + response.message);
+                    messageElement.fadeIn(300);
                 }
             },
             error: function(error) {
                 console.error('Error deleting message:', error);
+                messageElement.fadeIn(300);
             }
         });
-    }
-
+    });
+}
 
         $('#message_content').on('input', function() {
             $('#errorMessage').hide();
