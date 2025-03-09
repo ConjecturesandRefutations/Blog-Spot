@@ -93,66 +93,62 @@ $otherUser = $result->fetch_assoc();
             });
         }
 
-        // Display messages function
         function displayMessages(messages) {
-            let html = '';
-            messages.forEach(function(message) {
-                let messageClass = message.sender_user_id == currentUserId ? 'sent-message' : 'received-message';
+        let html = '';
+        messages.forEach(function(message) {
+            let messageClass = message.sender_user_id == currentUserId ? 'sent-message' : 'received-message';
+            html += `
+            <div class="${messageClass}">
+                <p>${message.message_content}</p>
+                <span>${message.timestamp}</span>
+            `;
+
+            // Only show the delete button if the message was sent by the current user
+            if (message.sender_user_id == currentUserId) {
                 html += `
-                <div class="${messageClass}">
-                    <p>${message.message_content}</p>
-                    <span>${message.timestamp}</span>
                     <p 
                         class="delete-message red-text" 
-                        style="border: none" 
+                        style="border: none; cursor: pointer;" 
                         data-message-id="${message.message_id}" 
-                        data-receiver-id="${message.receiver_user_id}" 
-                        data-sender-id="${message.sender_user_id}" 
-                        data-message-content="${message.message_content}"
                     >
                         Delete
                     </p>
-                </div>
                 `;
-            });
-            $('#messagesContainer').html(html);
+            }
 
-            $('.delete-message').click(function() {
-                const messageId = $(this).data('message-id');
-                const receiverId = $(this).data('receiver-id');
-                const senderId = $(this).data('sender-id');
-                const messageContent = $(this).data('message-content');
+            html += `</div>`;
+        });
 
-                if (confirm('Are you sure you want to delete this message?')) {
-                    deleteMessage(messageId, receiverId, senderId, messageContent);
+        $('#messagesContainer').html(html);
+
+        $('.delete-message').click(function() {
+            const messageId = $(this).data('message-id');
+
+            if (confirm('Are you sure you want to delete this message?')) {
+                deleteMessage(messageId);
+            }
+        });
+    }
+
+    function deleteMessage(messageId) {
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/messaging/delete_message.php',
+            data: { message_id: messageId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    fetchMessages();
+                } else {
+                    alert('Error deleting message: ' + response.message);
                 }
-            });
-        }
+            },
+            error: function(error) {
+                console.error('Error deleting message:', error);
+            }
+        });
+    }
 
-        // Function to delete a message
-        function deleteMessage(messageId, receiverId, senderId, messageContent) {
-            $.ajax({
-                type: 'POST',
-                url: 'utilities/messaging/delete_message.php',
-                data: { 
-                    message_id: messageId,
-                    receiver_id: receiverId,
-                    sender_id: senderId,
-                    message_content: messageContent
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        fetchMessages();
-                    } else {
-                        alert('Error deleting message: ' + response.message);
-                    }
-                },
-                error: function(error) {
-                    console.error('Error deleting message:', error);
-                }
-            });
-        }
 
         $('#message_content').on('input', function() {
             $('#errorMessage').hide();

@@ -77,9 +77,9 @@ font-style: italic;
   height: 100%;
 }
 
-@media only screen and (max-width: 992px) {
+@media(max-width: 1140px) {
   .brand-text {
-      margin-left: 50px;
+      margin-left: 50px !important;
   }
   }
 
@@ -307,7 +307,7 @@ font-style: italic;
 .placeholder{ position: absolute !important; left: 3% !important; } 
 .profile-placeholder{ position: absolute !important; left: 5% !important; }
 
-@media (max-width: 818px) {
+@media (max-width: 850px) {
   #nav-desktop {
     display: none !important;
   }
@@ -321,8 +321,18 @@ font-style: italic;
   #message-notifications-dropdown{
     position: absolute;
     left: 50%;
-    top: -3px;
   }
+  .both-dropdowns{
+    position: absolute;
+    right: 25%;
+    display: flex;
+    column-gap: 155px;
+    margin-top: -3px;
+}
+.new{
+  font-size: 16px;
+  margin-top: 3px;
+}
   .bell-text{
     color: #010100 !important;
 }
@@ -699,4 +709,15 @@ font-style: italic;
     .user-card .img{
         left: 28%
     }
+}
+
+@media(max-width:1140px) and (min-width:851px){
+  .brand-logo{
+      margin-left: 0  !important;
+      left: 50px;
+  }
+  .menu-stuff{
+      position: absolute;
+      right: 50px
+  }
 }

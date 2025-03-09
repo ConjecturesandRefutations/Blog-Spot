@@ -4,6 +4,8 @@ require_once realpath(__DIR__ . '/../config/base_path.php');
 require_once realpath(__DIR__ . '/../config/db_connect.php');
 
 require_once realpath(__DIR__ . '/../utilities/notifications/fetch_message_notifications.php');
+require_once realpath(__DIR__ . '/../utilities/notifications/fetch_blog_like_notifications.php');
+
 
 if (session_status() == PHP_SESSION_NONE) {
     // Start the session only if it's not already started
@@ -17,8 +19,12 @@ if (isset($_SESSION["user_id"])) {
   $loggedInUserId = $_SESSION["user_id"];
 
   $messageNotifications = fetchMessageNotifications($loggedInUserId, $mysqli); // Fetch message notifications
+  $blogLikeNotifications = fetchBlogLikeNotifications($loggedInUserId, $mysqli); // Fetch blog like notifications
 
   $totalMessageNotifications = count($messageNotifications); // Count message notifications
+  $totalBlogLikeNotifications = count($blogLikeNotifications); // Count blog like notifications
+
+  $totalNotifications =  $totalBlogLikeNotifications;
 
     $sql = "SELECT * FROM user WHERE user_id = {$_SESSION["user_id"]}";
     $result = $mysqli->query($sql);
@@ -77,7 +83,7 @@ function getFirstWords($string, $word_limit) {
     <div class="container header-container">
     <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
     <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
-    <ul class="right">
+    <ul class="right menu-stuff">
 
     <span id='nav-desktop'>
 
@@ -101,6 +107,7 @@ function getFirstWords($string, $word_limit) {
   <li><a href="<?php echo $user ? 'authentication/logout.php' : 'authentication/login.php'; ?>" class="write btn z-depth-0 secondary"><?php echo $user ? 'LOGOUT' : 'LOGIN'; ?></a></li>   
     
     </span>
+    <span class="both-dropdowns">
   <?php if (isset($_SESSION["user_id"])) : ?>
 
 <li class="dropdown-all">
@@ -129,7 +136,39 @@ function getFirstWords($string, $word_limit) {
           <?php endif; ?>
       </li>
 
+      <li class="dropdown-all">
+              <a class="menu-item dropdown-trigger" href="#!" id="standard-dropdown" data-target="standard-dropdown-list">
+                  <i class="material-icons bell <?php echo $totalNotifications > 0 ? 'red-text' : 'bell-text'; ?>">notifications</i>
+                  <span class="new" data-badge-caption="" style="<?php echo $totalNotifications > 0 ? '' : 'display:none;'; ?>">
+                      <?php echo $totalNotifications; ?>
+                  </span>
+              </a>
+                  <?php if ($totalNotifications > 0): ?>
+                      <ul id="standard-dropdown-list" class="dropdown-content">
+                          <?php foreach ($blogLikeNotifications as $notification): ?>
+                              <li class="like-notification" data-notification-id="<?php echo htmlspecialchars($notification['id']); ?>">
+                                  <a class="notification-link" href="view.php?id=<?php echo htmlspecialchars($notification['blog_id']); ?>">
+                                      <?php echo htmlspecialchars($notification['name']); ?> 
+                                      <?php echo $notification['action'] === 'like' ? 'liked' : 'disliked'; ?> your blog: 
+                                      <?php echo htmlspecialchars($notification['title']); ?>
+                                  </a>
+                                  <button class="remove-notification-btn" onclick="removeNotification(<?php echo $notification['id']; ?>, 'blog_like')">
+                                      <i class="material-icons">close</i>
+                                  </button>
+                              </li>
+                          <?php endforeach; ?>
+ 
+                      </ul>
+                  <?php else: ?>
+                      <ul id="standard-dropdown-list" class="dropdown-content">
+                          <li class="no-notifications">No new notifications</li>
+                      </ul>
+                  <?php endif; ?>
+              </li>
+
 <?php endif; ?>
+
+                  </span>
 
   </ul>
 
@@ -195,6 +234,31 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+function removeNotification(notificationId, notificationType) {
+      fetch('<?php echo BASE_URL; ?>utilities/notifications/remove_notifications.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'notificationId=' + encodeURIComponent(notificationId) + '&notificationType=' + encodeURIComponent(notificationType),
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data); // Log the response for debugging
+          if (data.status === 'success') {
+              M.toast({html: data.message});
+              // Reload the page to reflect changes
+              window.location.reload();
+          } else {
+              M.toast({html: 'Error: ' + data.message});
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          M.toast({html: 'Error: ' + error});
+      });
+  }
+
 function updateMessageNotifications(data) {
       const notifications = data.message_notifications;
       const messageBadge = document.querySelector("#message-notifications-dropdown .new");
@@ -237,7 +301,7 @@ function updateMessageNotifications(data) {
         messageDropdown.innerHTML = html;
       }
 
-      document.addEventListener("click", function(event) {
+  document.addEventListener("click", function(event) {
     const target = event.target.closest(".see-all-messages a");
     if (target) {
         event.preventDefault(); // Prevent default to avoid potential conflicts

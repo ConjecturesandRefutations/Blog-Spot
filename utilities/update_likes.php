@@ -14,6 +14,20 @@ if (isset($_POST['id']) && isset($_POST['action'])) {
     $action = mysqli_real_escape_string($conn, $_POST['action']);
     $userId = $_SESSION['user_id']; // Assuming you have stored user_id in session
 
+    // Fetch blog owner ID
+    $ownerSql = "SELECT user_id FROM blogs WHERE id = $id";
+    $ownerResult = mysqli_query($conn, $ownerSql);
+    
+    if ($ownerResult && mysqli_num_rows($ownerResult) > 0) {
+        $ownerRow = mysqli_fetch_assoc($ownerResult);
+        $blogOwnerId = $ownerRow['user_id'];
+    } else {
+        // Handle error: blog owner not found
+        $response['error'] = 'Blog owner not found';
+        echo json_encode($response);
+        exit;
+    }
+
     // Check if user has already interacted with the blog
     $checkSql = "SELECT * FROM likes WHERE user_id = $userId AND blog_id = $id";
     $checkResult = mysqli_query($conn, $checkSql);
@@ -101,11 +115,17 @@ if (isset($_POST['id']) && isset($_POST['action'])) {
                 $response['likes'] = $counts['likes'];
                 $response['dislikes'] = $counts['dislikes'];
             }
+    
+            if ($action == 'like' && $userId != $blogOwnerId) {
+                // Insert notification into blog_like_notifications only when the action is 'like'
+                $insertNotificationSql = "INSERT INTO blog_like_notifications (liker_id, receiver_id, action, blog_id) VALUES ($userId, $blogOwnerId, '$action', $id)";
+                mysqli_query($conn, $insertNotificationSql);
+            }
+            
         } else {
             $response['error'] = mysqli_error($conn);
         }
     }
-
     mysqli_close($conn);
 } else {
     $response['error'] = 'Invalid request';
