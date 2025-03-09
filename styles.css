@@ -274,10 +274,9 @@ font-style: italic;
   display: none !important;
 }
 
-#burger-anchor,#burger-img{
+.sidenav-trigger{
   display: none !important;
 }
-
 
 .hidden{
     display: none;
@@ -317,34 +316,22 @@ font-style: italic;
 }
 
 .fa-bars{
-  position: absolute;
-  font-size: 25px;
-  top: 8px;
-  margin-top: -13px;
+    font-size: 25px !important;
 }
-@media(min-width:500px){
-  .fa-bars{
-  right: 30px;
-  margin-right: -30px;
-}
-}
-@media(max-width:500px){
-  .fa-bars{
-  right: 0;
-  margin-right: -30px;
-}
+
+.favourite-topic{
+  height: 45px !important
 }
 
 @media (max-width: 850px) {
   #nav-desktop {
     display: none !important;
   }
-  #burger-anchor,#burger-img{
-    display: block !important;
-    height: 30px;
-    width: 30px;
-    margin-top: 6px !important;
-    left: 90% !important;
+  .sidenav-trigger{
+      display: block !important;
+    position: absolute !important;
+  top: 0 !important;
+  right: 10px;
   }
   #message-notifications-dropdown{
     position: absolute;
@@ -376,18 +363,13 @@ font-style: italic;
 }
 
 @media (max-width: 500px) {
-    
-    #burger-anchor,#burger-img{
-    left: 50% !important;
-  }
-    
-  .login-card {
+      .login-card {
     margin: 0;
     width: 400px;
   }
   #brand-image{
     display: block !important;
-    margin-left: 30px;
+    margin-left: 10px;
   }
   #brand{
     display: none !important;
@@ -457,9 +439,6 @@ font-style: italic;
   .login-card {
     margin: 0;
     width: 250px;
-  }
-      #burger-anchor,#burger-img{
-    left: 40% !important;
   }
 }
 
@@ -748,4 +727,20 @@ font-style: italic;
       position: absolute;
       right: 50px
   }
+}
+
+@media (max-width: 450px) {
+    .both-dropdowns{
+        position: absolute;
+        left: 29%;
+        display: flex;
+        column-gap: 155px;
+        margin-top: -3px;
+    }
+    .message-dropdown .dropdown-trigger{
+        margin-left: -5px
+    }
+    .notification-dropdown{
+        margin-left: -20px
+    }
 }
