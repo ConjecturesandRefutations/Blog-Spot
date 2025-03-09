@@ -307,6 +307,34 @@ font-style: italic;
 .placeholder{ position: absolute !important; left: 3% !important; } 
 .profile-placeholder{ position: absolute !important; left: 5% !important; }
 
+.like-notification, .feedback-notification{
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+}
+.like-notification .notification-link, .feedback-notification .notification-link{
+  width: 100%
+}
+
+.fa-bars{
+  position: absolute;
+  font-size: 25px;
+  top: 8px;
+  margin-top: -13px;
+}
+@media(min-width:500px){
+  .fa-bars{
+  right: 30px;
+  margin-right: -30px;
+}
+}
+@media(max-width:500px){
+  .fa-bars{
+  right: 0;
+  margin-right: -30px;
+}
+}
+
 @media (max-width: 850px) {
   #nav-desktop {
     display: none !important;
@@ -333,8 +361,8 @@ font-style: italic;
   font-size: 16px;
   margin-top: 3px;
 }
-  .bell-text{
-    color: #010100 !important;
+.bell-text, .fa-bars{
+  color: rgb(97, 97, 97);
 }
 .red-text{
   color: red !important;

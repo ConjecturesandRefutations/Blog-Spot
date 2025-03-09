@@ -5,6 +5,7 @@ require_once realpath(__DIR__ . '/../config/db_connect.php');
 
 require_once realpath(__DIR__ . '/../utilities/notifications/fetch_message_notifications.php');
 require_once realpath(__DIR__ . '/../utilities/notifications/fetch_blog_like_notifications.php');
+require_once realpath(__DIR__ . '/../utilities/notifications/fetch_feedback_notifications.php');
 
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -20,11 +21,14 @@ if (isset($_SESSION["user_id"])) {
 
   $messageNotifications = fetchMessageNotifications($loggedInUserId, $mysqli); // Fetch message notifications
   $blogLikeNotifications = fetchBlogLikeNotifications($loggedInUserId, $mysqli); // Fetch blog like notifications
+  $feedbackNotifications = fetchFeedbackNotifications($loggedInUserId, $mysqli); // Fetch feedback notifications
+  $totalFeedbackNotifications = count($feedbackNotifications); // Count feedback notifications
 
   $totalMessageNotifications = count($messageNotifications); // Count message notifications
   $totalBlogLikeNotifications = count($blogLikeNotifications); // Count blog like notifications
+  $totalFeedbackNotifications = count($feedbackNotifications); // Count feedback notifications
 
-  $totalNotifications =  $totalBlogLikeNotifications;
+  $totalNotifications =  $totalBlogLikeNotifications + $totalFeedbackNotifications;
 
     $sql = "SELECT * FROM user WHERE user_id = {$_SESSION["user_id"]}";
     $result = $mysqli->query($sql);
@@ -82,7 +86,7 @@ function getFirstWords($string, $word_limit) {
 <nav class="white z-depth-0 header" id="header">
     <div class="container header-container">
     <a href="index.php" class="left brand-logo brand-text" id="brand">Blog Spot</a>
-    <a href="index.php" class="left"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
+    <a href="index.php" class="left logo-img"><img src="./images/BS.png" alt="Blog Spot Brand Title" id="brand-image"/></a>
     <ul class="right menu-stuff">
 
     <span id='nav-desktop'>
@@ -121,7 +125,7 @@ function getFirstWords($string, $word_limit) {
               <ul id="message-notifications-dropdown-list" class="dropdown-content">
                   <?php foreach ($messageNotifications as $notification): ?>
                       <li>
-                      <a href="<?php echo BASE_URL; ?>conversation.php?user_id=<?php echo htmlspecialchars($notification['sender_id']); ?>">
+                      <a href="https://blogspot.host/conversation.php?user_id=<?php echo htmlspecialchars($notification['sender_id']); ?>">
                           New message from <?php echo htmlspecialchars($notification['name']); ?>
                       </a>
                           <hr/>
@@ -131,7 +135,7 @@ function getFirstWords($string, $word_limit) {
           <?php else: ?>
               <ul id="message-notifications-dropdown-list" class="dropdown-content">
                   <li class="no-notifications">No new messages</li>
-                  <li class="see-all-messages"><a style="color: #64B5F6;" href="<?php echo htmlspecialchars(BASE_URL); ?>messages.php" aria-label="View all messages">All Messages</a></li>
+                  <li class="see-all-messages"><a style="color: #64B5F6;" href="https://blogspot.host/messages.php" aria-label="View all messages">All Messages</a></li>
                   </ul>
           <?php endif; ?>
       </li>
@@ -157,7 +161,17 @@ function getFirstWords($string, $word_limit) {
                                   </button>
                               </li>
                           <?php endforeach; ?>
- 
+                          <?php foreach ($feedbackNotifications as $notification): ?>
+                              <li class="feedback-notification" data-notification-id="<?php echo htmlspecialchars($notification['id']); ?>">
+                                  <a href="view.php?id=<?php echo htmlspecialchars($notification['blog_id']); ?>#feedback-section" class="notification-link">
+                                      <?php echo htmlspecialchars($notification['name']); ?> gave feedback on your blog: 
+                                      <?php echo htmlspecialchars(getFirstWords($notification['feedback_content'], 10)); ?>
+                                  </a>
+                                  <button class="remove-notification-btn" onclick="removeNotification(<?php echo $notification['id']; ?>, 'feedback')">
+                                      <i class="material-icons">close</i>
+                                  </button>
+                              </li>
+                          <?php endforeach; ?>
                       </ul>
                   <?php else: ?>
                       <ul id="standard-dropdown-list" class="dropdown-content">
@@ -172,7 +186,7 @@ function getFirstWords($string, $word_limit) {
 
   </ul>
 
-    <a href="#" data-target="mobile-nav" class="sidenav-trigger" id="burger-anchor"><img src="images/burger.png" alt="burger menu" class="fa fa-bars black-text" id="burger-img"></a>
+    <a href="#" data-target="mobile-nav" class="sidenav-trigger" id="burger-anchor"><i class="fa-solid fa-bars"></i></a>
     </div>
 
 
@@ -235,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function removeNotification(notificationId, notificationType) {
-      fetch('<?php echo BASE_URL; ?>utilities/notifications/remove_notifications.php', {
+      fetch('utilities/notifications/remove_notifications.php', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -283,7 +297,7 @@ function updateMessageNotifications(data) {
           notifications.forEach(notification => {
             html += `
               <li>
-                <a href="<?php echo BASE_URL; ?>conversation.php?user_id=${notification.sender_id}">
+                <a href="https://blogspot.host/conversation.php?user_id=${notification.sender_id}">
                   New message from ${name}
                 </a>
                 <hr/>
@@ -294,7 +308,7 @@ function updateMessageNotifications(data) {
           html += `
             <li class="no-notifications">No new messages</li>
             <li style="border-top:1px solid grey" class="see-all-messages">
-              <a style="color: #64B5F6" href="<?php echo BASE_URL; ?>messages.php" aria-label="View all messages">All Messages</a>
+              <a style="color: #64B5F6" href="https://blogspot.host/messages.php" aria-label="View all messages">All Messages</a>
             </li>
           `;
         }

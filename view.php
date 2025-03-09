@@ -102,8 +102,6 @@ if (isset($_POST['delete_featured_image'])) {
     }
 }
 
-
-// Check GET request id parameter
 // Check GET request id parameter
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -170,28 +168,6 @@ if (isset($_GET['id'])) {
     mysqli_free_result($feedbackResult);
 
     mysqli_close($conn);
-}
-
-// Handle Feedback Submission
-if (isset($_POST['submit_feedback'])) {
-    $blog_id = mysqli_real_escape_string($conn, $_POST['blog_id']);
-    $user_id = $_SESSION['user_id'] ?? null; // Get the logged-in user ID from the session
-    $feedback_text = mysqli_real_escape_string($conn, $_POST['feedback_text']);
-
-    echo "User ID: $user_id, Blog ID: $blog_id";
-    echo "User ID from Session: " . $_SESSION['user_id'] . ", Blog ID: $blog_id";
-
-
-    // Insert feedback into the database
-    $sql = "INSERT INTO feedback (user_id, blog_id, feedback_text) VALUES ('$user_id', '$blog_id', '$feedback_text')";
-
-    if (mysqli_query($conn, $sql)) {
-        // Success
-        header('Location: view.php?id=' . $blog_id);
-    } else {
-        // Failure
-        echo 'query error: ' . mysqli_error($conn);
-    }
 }
 
 // Handle Image Upload
@@ -431,28 +407,30 @@ $clean_content = $purifier->purify($blog['content']);
 <!-- Display feedback -->
 <?php if (isset($feedback) && !empty($feedback)): ?>
     <hr>
-    <div class="feedback-section center">
-        <h5>User Feedback</h5>
-        <ul>
-            <?php foreach ($feedback as $fb): ?>
-                <li id="feedback_<?php echo $fb['feedback_id']; ?>">
-                    <p>
-                        <strong><?php echo htmlspecialchars($fb['feedback_author']); ?>:</strong>
-                        <span class="feedback-text"><?php echo nl2br(htmlspecialchars($fb['feedback_text'])); ?></span>
-                    </p>
-                    
-                    <?php if ($fb['user_id'] == $loggedInUserId): ?>
-                        <!-- Edit and delete options for user's own feedback -->
-                        <button type="button" class="btn orange lighten-3 z-depth-0 edit-feedback-btn" data-feedback-id="<?php echo $fb['feedback_id']; ?>">Edit</button>
-                        <form class="delete-feedback-form" action="utilities/delete_feedback.php" method="POST" style="display: inline;">
-                            <input type="hidden" name="feedback_id" value="<?php echo $fb['feedback_id']; ?>">
-                            <input type="hidden" name="blog_id" value="<?php echo $fb['blog_id']; ?>">
-                            <button type="submit" name="delete_feedback" class="btn red lighten-3 z-depth-0">Delete</button>
-                        </form>
-                    <?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+    <div class="feedback-section center" id="feedback-section">
+        <div class="card-panel teal lighten-5">
+        <h5 class="center-align">User Feedback</h5>
+            <ul class="collection">
+                <?php foreach ($feedback as $fb): ?>
+                    <li class="collection-item" id="feedback_<?php echo $fb['feedback_id']; ?>">
+                        <p>
+                            <strong><?php echo htmlspecialchars($fb['feedback_author']); ?>:</strong>
+                            <span class="feedback-text"><?php echo nl2br(htmlspecialchars($fb['feedback_text'])); ?></span>
+                        </p>
+                        
+                        <?php if ($fb['user_id'] == $loggedInUserId): ?>
+                            <!-- Edit and delete options for user's own feedback -->
+                            <button type="button" class="btn orange lighten-3 z-depth-0 edit-feedback-btn" data-feedback-id="<?php echo $fb['feedback_id']; ?>">Edit</button>
+                            <form class="delete-feedback-form" action="utilities/delete_feedback.php" method="POST" style="display: inline;">
+                                <input type="hidden" name="feedback_id" value="<?php echo $fb['feedback_id']; ?>">
+                                <input type="hidden" name="blog_id" value="<?php echo $fb['blog_id']; ?>">
+                                <button type="submit" name="delete_feedback" class="btn red lighten-3 z-depth-0">Delete</button>
+                            </form>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </div>
 <?php endif; ?>
 
@@ -463,7 +441,31 @@ $clean_content = $purifier->purify($blog['content']);
 <script>
 
 $(document).ready(function() {
-    console.log("jQuery is loaded and ready!");
+    $('#feedbackForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Prepare form data
+        var formData = {
+            feedback_text: $('#feedbackTextarea').val(),
+            blog_id: $('input[name="blog_id"]').val()
+        };
+
+        // Perform the AJAX request
+        $.ajax({
+            type: 'POST',
+            url: 'utilities/write_feedback.php',
+            data: formData,
+            success: function(response) {
+                // Refresh the page after successful feedback submission
+                window.scrollTo(0, document.body.scrollHeight);
+                location.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // Handle error - display a message
+                $('#feedbackResponse').html('<p>Error: ' + errorThrown + '</p>');
+            }
+        });
+    });
 });
 
 document.addEventListener('DOMContentLoaded', function() {

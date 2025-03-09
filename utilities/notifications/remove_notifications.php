@@ -13,29 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notificationId']) && 
 
     // Determine which table to delete from based on the notification type
     switch ($notificationType) {
-        case 'like':
-            $query = "DELETE FROM post_likes_notifications WHERE id = ?";
-            break;
-        case 'comment_like':
-            $query = "DELETE FROM comment_likes_notifications WHERE id = ?";
-            break;
-        case 'reply_like':
-            $query = "DELETE FROM reply_likes_notifications WHERE id = ?";
-            break;
         case 'blog_like':
             $query = "DELETE FROM blog_like_notifications WHERE id = ?";
             break;
-        case 'comment':
-            $query = "DELETE FROM post_comment_notifications WHERE id = ?";
-            break;
         case 'feedback':
             $query = "DELETE FROM blog_feedback_notifications WHERE id = ?";
-            break;
-        case 'accepted':
-            $query = "DELETE FROM friend_accepted_notifications WHERE id = ?";
-            break;
-        case 'reply':
-            $query = "DELETE FROM post_reply_notifications WHERE id = ?";
             break;
         default:
             $response = [
