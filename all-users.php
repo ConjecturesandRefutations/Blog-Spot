@@ -113,7 +113,7 @@ $(document).ready(function() {
 
                 users.forEach(function(profileUser) {
                     var userCard = `
-                        <div class="col s12 m6 l4 user" data-user-id="${profileUser.user_id}">
+                        <div class="col s12 m6 l4" data-user-id="${profileUser.user_id}">
                             <div class="card ${profileUser.isCurrentUser ? 'grey lighten-3' : ''}">
                                 <div class="card-content">
                                     <div class="center-align">

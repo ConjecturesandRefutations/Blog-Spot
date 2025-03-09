@@ -41,7 +41,7 @@ if (isset($_GET["id"])) {
     ?>
     <div class="row">
         <?php foreach($blogs as $blog): ?>
-                <div class="col s12 profile-card" style="border: 1px solid grey;" >
+                <div class="col s12 card" >
                     <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
                         <div class="card-content">
                             <h6 style="font-weight: bold"><?php echo htmlspecialchars($blog['title']); ?></h6>

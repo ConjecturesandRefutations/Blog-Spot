@@ -179,6 +179,7 @@
                 </div>
             <?php endif; ?>
         </form>
+        <?php if ($profileUser['user_id'] == 1) echo '<p style="font-weight: bold">SITE ADMIN & CREATOR</p>'; ?>
     </div>
 
     </div>
@@ -196,7 +197,7 @@
 
                         <!-- Search Bar -->
                         <div class="row search-profile">
-                        <div class="col s12 l6 offset-l3">
+                        <div class="col s12 l8 offset-l2">
                             <form action="<?php echo "profile.php" . (isset($profileUser['user_id']) ? "?id={$profileUser['user_id']}" : ''); ?>" method="GET" id="searchForm">
                                 <div class="input-field col s12">
                                     <i class="material-icons prefix">search</i>
@@ -221,7 +222,7 @@
             <?php endif; ?>
             <div id="blogList">
                 <?php foreach($blogs as $blog): ?>
-                    <div class="col s12 profile-card" style="border: 1px solid grey;" >
+                    <div class="col s12 card personal-blog-card" >
                         <a href="view.php?id=<?php echo $blog['id']; ?>" class="center grey-text text-darken-2">
                             <div class="card-content">
                                 <h6 style="font-weight: bold"><?php echo htmlspecialchars($blog['title']); ?></h6>
